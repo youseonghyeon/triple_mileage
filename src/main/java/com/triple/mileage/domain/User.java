@@ -26,4 +26,8 @@ public class User extends BaseTimeEntity {
     public User() {
         // 필드 추가 시 내용 추가
     }
+
+    public void plusMileage(int mileage) {
+        this.mileage += mileage;
+    }
 }

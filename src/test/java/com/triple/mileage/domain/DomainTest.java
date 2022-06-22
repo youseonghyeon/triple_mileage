@@ -130,8 +130,11 @@ class DomainTest {
     @Test
     @DisplayName("PointHistory 생성")
     void createPointHistory() {
+        User user = testUtils.createUser();
+        Place place = testUtils.createPlace();
+        Review review = testUtils.createReview(user, place);
         //when
-        PointHistory pointHistory = testUtils.createPointHistory();
+        PointHistory pointHistory = testUtils.createPointHistory(review);
         //then
         assertNotNull(pointHistory.getId());
         assertEquals(pointHistory.getId().getClass(), UUID.class);

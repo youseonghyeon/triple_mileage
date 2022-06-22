@@ -30,10 +30,13 @@ public class ReviewController {
         EventAction action = eventDto.getAction();
         if (action.equals(EventAction.ADD)) {
             reviewService.addReview(eventDto);
+
         } else if (action.equals(EventAction.MOD)) {
             reviewService.modifyReview(eventDto);
+
         } else if (action.equals(EventAction.DELETE)) {
             reviewService.deleteReview(eventDto);
+
         }
     }
 }

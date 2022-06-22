@@ -58,8 +58,8 @@ public class TestUtils {
         return place;
     }
 
-    public PointHistory createPointHistory() {
-        PointHistory pointHistory = new PointHistory(TestConst.POINT_TYPE, TestConst.POINT_ACTION, TestConst.POINT_VALUE);
+    public PointHistory createPointHistory(Review review) {
+        PointHistory pointHistory = new PointHistory(review, TestConst.POINT_TYPE, TestConst.POINT_ACTION, TestConst.POINT_VALUE);
         pointRepository.save(pointHistory);
         return pointHistory;
     }

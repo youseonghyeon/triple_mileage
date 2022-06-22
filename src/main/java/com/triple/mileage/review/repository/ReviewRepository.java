@@ -13,4 +13,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     @EntityGraph(attributePaths = {"photos"}, type = EntityGraph.EntityGraphType.FETCH)
     Review findWithPhotosById(UUID reviewId);
 
+    boolean existsByPlaceId(UUID placeId);
+
 }

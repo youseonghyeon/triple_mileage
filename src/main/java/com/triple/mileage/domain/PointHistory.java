@@ -27,15 +27,28 @@ public class PointHistory extends BaseEntity {
 
     private int value;
 
-    public PointHistory(String type, String action, int value) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
+    private Review review;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User receiver;
+
+    public PointHistory(Review review, String type, String action, int value) {
+        this.review = review;
+        this.receiver = review.getReviewer();
         this.type = EventType.valueOf(type);
         this.action = EventAction.valueOf(action);
         this.value = value;
     }
 
-    public PointHistory(EventType type, EventAction action, int value) {
+    public PointHistory(Review review, EventType type, EventAction action, int value) {
+        this.review = review;
+        this.receiver = review.getReviewer();
         this.type = type;
         this.action = action;
+        this.review = review;
         this.value = value;
     }
 }

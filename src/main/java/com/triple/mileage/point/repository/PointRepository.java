@@ -8,4 +8,6 @@ import java.util.UUID;
 
 @Transactional(readOnly = true)
 public interface PointRepository extends JpaRepository<PointHistory, UUID> {
+
+    PointHistory findByReviewIdAndReceiverId(UUID reviewId, UUID receiverId);
 }

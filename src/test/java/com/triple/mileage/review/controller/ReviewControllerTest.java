@@ -42,7 +42,6 @@ class ReviewControllerTest {
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
         UUID reviewId = UUID.randomUUID();
-//        Review review = testUtils.createReview(user, place);
         List<UUID> photoIds = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             Photo photo = testUtils.createPhoto();
