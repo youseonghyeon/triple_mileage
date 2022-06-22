@@ -1,6 +1,8 @@
 package com.triple.mileage.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -19,6 +21,9 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id", columnDefinition = "BINARY(16)")
     private UUID id;
 
-    private int mileage;
+    private int mileage = 0;
 
+    public User() {
+        // 필드 추가 시 내용 추가
+    }
 }

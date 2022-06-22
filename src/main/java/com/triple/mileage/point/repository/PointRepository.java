@@ -7,5 +7,5 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Transactional(readOnly = true)
-public interface PointRepository extends JpaRepository<UUID, PointHistory> {
+public interface PointRepository extends JpaRepository<PointHistory, UUID> {
 }

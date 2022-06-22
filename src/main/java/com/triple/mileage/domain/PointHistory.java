@@ -1,6 +1,8 @@
 package com.triple.mileage.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -11,6 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PointHistory extends BaseEntity {
 
     @Id
@@ -24,4 +27,10 @@ public class PointHistory extends BaseEntity {
     private String action;
 
     private int value;
+
+    public PointHistory(String type, String action, int value) {
+        this.type = type;
+        this.action = action;
+        this.value = value;
+    }
 }

@@ -1,6 +1,8 @@
 package com.triple.mileage.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -8,6 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseTimeEntity {
 
     @Id
@@ -26,4 +29,9 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "place_id")
     private Place place;
 
+    public Review(String content, User reviewer, Place place) {
+        this.content = content;
+        this.reviewer = reviewer;
+        this.place = place;
+    }
 }

@@ -7,6 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Transactional(readOnly = true)
-public interface ReviewRepository extends JpaRepository<UUID, Review> {
+public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
 }
