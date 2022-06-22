@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: jdbc:mysql://localhost:3306/mileage
+    username: market_test
+    password: 12201220
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
