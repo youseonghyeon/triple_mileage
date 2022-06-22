@@ -21,4 +21,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
     boolean existsByPlaceId(UUID placeId);
 
+    boolean existsByPlaceIdAndReviewerId(UUID place, UUID reviewerId);
+
 }

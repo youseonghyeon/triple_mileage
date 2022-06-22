@@ -62,7 +62,7 @@ public class ReviewService {
     }
 
 
-    public UUID modifyReview(EventDto eventDto) {
+    public void modifyReview(EventDto eventDto) {
         Review review = reviewRepository.findById(eventDto.getReviewId()).orElseThrow();
         List<Photo> photos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
 
@@ -80,7 +80,6 @@ public class ReviewService {
         if (mileage != 0) {
             pointService.saveAndGiveMileage(review.getReviewer(), review, eventDto.getType(), eventDto.getAction(), mileage);
         }
-        return review.getId();
     }
 
     public void deleteReview(EventDto eventDto) {

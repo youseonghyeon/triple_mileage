@@ -148,6 +148,10 @@ class ReviewServiceTest {
     @Test
     @DisplayName("리뷰 수정(사진 추가)")
     void modifyReview_사진추가() {
+        /**
+         * 첫 리뷰(사진X) 2점
+         * 사진 추가 1점
+         */
         //given
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
@@ -155,7 +159,7 @@ class ReviewServiceTest {
         UUID uuid = reviewService.addReview(eventDto);
         Photo photo = testUtils.createPhoto();
         String newContent = "수정된 내용";
-        EventDto modifyEventDto = createEventDtoWithReviewId(uuid, user, place, photo, newContent);
+        EventDto modifyEventDto = createModEventDto(uuid, user, place, photo, newContent);
         //when
         reviewService.modifyReview(modifyEventDto);
         //then
@@ -174,6 +178,10 @@ class ReviewServiceTest {
     @Test
     @DisplayName("리뷰 수정(사진 제거)")
     void modifyReview_사진삭제() {
+        /**
+         * 첫 리뷰 3점
+         * 사진 제거 -1점
+         */
         //given
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
@@ -181,7 +189,7 @@ class ReviewServiceTest {
         EventDto eventDto = createEventDto(user, place, photo);
         UUID uuid = reviewService.addReview(eventDto);
         String newContent = "수정된 내용";
-        EventDto modifyEventDto = createEventDtoWithReviewId(uuid, user, place, null, newContent);
+        EventDto modifyEventDto = createModEventDto(uuid, user, place, null, newContent);
         //when
         reviewService.modifyReview(modifyEventDto);
         //then
@@ -194,6 +202,46 @@ class ReviewServiceTest {
         assertEquals(2, user.getMileage()); // 3 - 1점
         assertEquals(3, histories.get(0).getValue());
         assertEquals(-1, histories.get(1).getValue()); // 1점 제거
+    }
+
+    @Test
+    @DisplayName("리뷰 삭제(수정포함)")
+    void deleteReview() {
+        /**
+         * 첫 리뷰 3점
+         * 사진 제거 -1점
+         * 리뷰 삭제 -2점
+         */
+        //given
+        User user = testUtils.createUser();
+        Place place = testUtils.createPlace();
+        Photo photo = testUtils.createPhoto();
+        EventDto eventDto = createEventDto(user, place, photo);
+        UUID uuid = reviewService.addReview(eventDto);
+        String newContent = "수정된 내용";
+        EventDto modifyEventDto = createModEventDto(uuid, user, place, null, newContent);
+        reviewService.modifyReview(modifyEventDto);
+        EventDto deleteEventDto = createDeleteEventDto(uuid, user, place);
+        //when
+        reviewService.deleteReview(modifyEventDto);
+        //then
+        List<PointHistory> histories = pointRepository.findByReceiverIdOrderByCreatedDateAsc(user.getId());
+        //then
+        assertEquals(3, histories.size());
+        assertEquals(3, histories.get(0).getValue()); // 3점 추가
+        assertEquals(-1, histories.get(1).getValue()); // 1점 제거
+        assertEquals(-2, histories.get(2).getValue()); // 2점 제거
+        assertEquals(0, user.getMileage()); // 3 -1 -2점
+    }
+
+    private EventDto createDeleteEventDto(UUID uuid, User user, Place place) {
+        EventDto eventDto = new EventDto();
+        eventDto.setReviewId(uuid);
+        eventDto.setType(EventType.REVIEW);
+        eventDto.setAction(EventAction.DELETE);
+        eventDto.setUserId(user.getId());
+        eventDto.setPlaceId(place.getId());
+        return eventDto;
     }
 
 
@@ -211,7 +259,7 @@ class ReviewServiceTest {
         return eventDto;
     }
 
-    private EventDto createEventDtoWithReviewId(UUID reviewId, User user, Place place, Photo photo, String content) {
+    private EventDto createModEventDto(UUID reviewId, User user, Place place, Photo photo, String content) {
         EventDto eventDto = new EventDto();
         eventDto.setReviewId(reviewId);
         eventDto.setType(EventType.REVIEW);

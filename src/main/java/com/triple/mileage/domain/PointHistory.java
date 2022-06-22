@@ -30,6 +30,8 @@ public class PointHistory extends BaseTimeEntity {
     @Column(columnDefinition = "BINARY(16)")
     private UUID reviewId;
 
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User receiver;

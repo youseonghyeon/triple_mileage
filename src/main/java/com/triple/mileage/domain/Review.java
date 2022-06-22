@@ -28,7 +28,7 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    @OneToMany(mappedBy = "review")
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE)
     private List<Photo> photos;
 
 
