@@ -1,8 +1,6 @@
 package com.triple.mileage.domain;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -27,7 +25,7 @@ public class User extends BaseTimeEntity {
         // 필드 추가 시 내용 추가
     }
 
-    public void plusMileage(int mileage) {
+    public void giveMileage(int mileage) {
         this.mileage += mileage;
     }
 }

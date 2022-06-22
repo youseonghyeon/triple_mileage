@@ -3,6 +3,7 @@ package com.triple.mileage;
 import com.triple.mileage.domain.*;
 import com.triple.mileage.place.repository.PlaceRepository;
 import com.triple.mileage.point.repository.PointRepository;
+import com.triple.mileage.review.dto.EventDto;
 import com.triple.mileage.review.repository.PhotoRepository;
 import com.triple.mileage.review.repository.ReviewRepository;
 import com.triple.mileage.user.repository.UserRepository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.*;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 @Transactional
@@ -26,6 +29,18 @@ public class TestUtils {
     PhotoRepository photoRepository;
     @Autowired
     PlaceRepository placeRepository;
+
+    public EventDto createEventDto(User user, Place place, UUID reviewId, List<UUID> photoIds) {
+        EventDto eventDto = new EventDto();
+        eventDto.setType(EventType.REVIEW);
+        eventDto.setAction(EventAction.ADD);
+        eventDto.setReviewId(reviewId);
+        eventDto.setContent(TestConst.REVIEW_CONTENT);
+        eventDto.setAttachedPhotoIds(photoIds);
+        eventDto.setUserId(user.getId());
+        eventDto.setPlaceId(place.getId());
+        return eventDto;
+    }
 
 
     public User createUser() {

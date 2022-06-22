@@ -1,9 +1,10 @@
 package com.triple.mileage.review.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.triple.mileage.TestConst;
 import com.triple.mileage.TestUtils;
-import com.triple.mileage.domain.*;
+import com.triple.mileage.domain.Photo;
+import com.triple.mileage.domain.Place;
+import com.triple.mileage.domain.User;
 import com.triple.mileage.review.dto.EventDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
-@Commit
 class ReviewControllerTest {
 
     @Autowired
@@ -48,7 +48,7 @@ class ReviewControllerTest {
             photoIds.add(photo.getId());
         }
 
-        EventDto eventDto = createEventDto(user, place, reviewId, photoIds);
+        EventDto eventDto = testUtils.createEventDto(user, place, reviewId, photoIds);
 
         //then
         mockMvc.perform(post("/events")
@@ -59,17 +59,7 @@ class ReviewControllerTest {
 
     }
 
-    private EventDto createEventDto(User user, Place place, UUID reviewId, List<UUID> photoIds) {
-        EventDto eventDto = new EventDto();
-        eventDto.setType(EventType.REVIEW);
-        eventDto.setAction(EventAction.ADD);
-        eventDto.setReviewId(reviewId);
-        eventDto.setContent(TestConst.REVIEW_CONTENT);
-        eventDto.setAttachedPhotoIds(photoIds);
-        eventDto.setUserId(user.getId());
-        eventDto.setPlaceId(place.getId());
-        return eventDto;
-    }
+
 
 
 }

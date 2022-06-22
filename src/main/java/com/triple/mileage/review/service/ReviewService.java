@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -29,9 +30,9 @@ public class ReviewService {
     private final PointRepository pointRepository;
 
 
-    public void addReview(EventDto eventDto) {
-        User reviewer = userRepository.findById(eventDto.getUserId()).orElseThrow();
-        Review review = saveReview(reviewer, eventDto);
+    public UUID addReview(EventDto eventDto) {
+        User user = userRepository.findById(eventDto.getUserId()).orElseThrow();
+        Review review = saveReview(user, eventDto);
 
         int mileage = 0;
         if (!eventDto.getContent().isEmpty()) {
@@ -45,12 +46,13 @@ public class ReviewService {
         }
 
         if (mileage != 0) {
-            pointService.saveAndGiveMileage(review, eventDto, mileage);
+            pointService.saveAndGiveMileage(review, eventDto.getType(), eventDto.getAction(), mileage);
         }
+        return review.getId();
     }
 
 
-    public void modifyReview(EventDto eventDto) {
+    public UUID modifyReview(EventDto eventDto) {
         Review review = reviewRepository.findWithPhotosById(eventDto.getReviewId());
         int before = review.getPhotos().size(); // 수정 전 사진 개수
         int after = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
@@ -66,8 +68,9 @@ public class ReviewService {
         }
 
         if (mileage != 0) {
-            pointService.saveAndGiveMileage(eventDto, mileage);
+            pointService.saveAndGiveMileage(review, eventDto.getType(), eventDto.getAction(), mileage);
         }
+        return review.getId();
     }
 
     public void deleteReview(EventDto eventDto) {
@@ -78,7 +81,7 @@ public class ReviewService {
             throw new RuntimeException("포인트 내역이 존재하지 않습니다.");
         }
         int mileage = pointHistory.getValue();
-        pointService.saveAndGiveMileage(review, eventDto, mileage * (-1));
+        pointService.saveAndGiveMileage(review, eventDto.getType(), eventDto.getAction(), mileage * (-1));
         reviewRepository.delete(review);
     }
 
