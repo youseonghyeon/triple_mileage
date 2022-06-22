@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Getter
@@ -22,13 +19,21 @@ public class PointHistory extends BaseEntity {
     @Column(name = "point_id", columnDefinition = "BINARY(16)")
     private UUID id;
 
-    private String type;
+    @Enumerated(value = EnumType.STRING)
+    private EventType type;
 
-    private String action;
+    @Enumerated(value = EnumType.STRING)
+    private EventAction action;
 
     private int value;
 
     public PointHistory(String type, String action, int value) {
+        this.type = EventType.valueOf(type);
+        this.action = EventAction.valueOf(action);
+        this.value = value;
+    }
+
+    public PointHistory(EventType type, EventAction action, int value) {
         this.type = type;
         this.action = action;
         this.value = value;
