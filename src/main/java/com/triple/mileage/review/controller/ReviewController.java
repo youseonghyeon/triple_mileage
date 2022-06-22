@@ -14,6 +14,7 @@ public class ReviewController {
 
     @PostMapping("/events")
     public void eventHandler(@RequestBody EventDto eventDto) {
+
         log.info(eventDto.toString());
 
     }

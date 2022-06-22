@@ -2,10 +2,13 @@ package com.triple.mileage.domain;
 
 import com.triple.mileage.TestConst;
 import com.triple.mileage.TestUtils;
+import com.triple.mileage.place.repository.PlaceRepository;
 import com.triple.mileage.point.repository.PointRepository;
 import com.triple.mileage.review.repository.PhotoRepository;
+import com.triple.mileage.review.repository.ReviewRepository;
 import com.triple.mileage.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,15 +31,24 @@ class DomainTest {
     @Autowired
     PhotoRepository photoRepository;
     @Autowired
+    ReviewRepository reviewRepository;
+    @Autowired
     PointRepository pointRepository;
+    @Autowired
+    PlaceRepository placeRepository;
 
 
     @AfterEach
     void reset() {
         photoRepository.deleteAll();
+        reviewRepository.deleteAll();
+        placeRepository.deleteAll();
+        pointRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
+    @DisplayName("User 생성")
     void createUser() {
         //when
         User user = testUtils.createUser();
@@ -49,6 +61,7 @@ class DomainTest {
     }
 
     @Test
+    @DisplayName("Review 생성")
     void createReview() {
         //given
         User user = testUtils.createUser();
@@ -66,6 +79,7 @@ class DomainTest {
     }
 
     @Test
+    @DisplayName("Place 생성")
     void createPlace() {
         //when
         Place place = testUtils.createPlace();
@@ -78,6 +92,7 @@ class DomainTest {
     }
 
     @Test
+    @DisplayName("Photo 생성")
     void createPhotoTest() {
         // given
         User user = testUtils.createUser();
@@ -97,6 +112,7 @@ class DomainTest {
     }
 
     @Test
+    @DisplayName("Photo 생성(리뷰 없이 단독)")
     void createPhotoWithoutReviewTest() {
         //when
         Photo photo = testUtils.createPhoto();
@@ -112,6 +128,7 @@ class DomainTest {
     }
 
     @Test
+    @DisplayName("PointHistory 생성")
     void createPointHistory() {
         //when
         PointHistory pointHistory = testUtils.createPointHistory();

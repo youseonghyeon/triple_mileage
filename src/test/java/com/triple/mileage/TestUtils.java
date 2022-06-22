@@ -28,8 +28,6 @@ public class TestUtils {
     PlaceRepository placeRepository;
 
 
-
-
     public User createUser() {
         User user = new User();
         userRepository.save(user);
@@ -48,7 +46,7 @@ public class TestUtils {
         return photo;
     }
 
-    public Photo createPhoto() {
+    public Photo createPhoto() { // without review
         Photo photo = Photo.createPhotoWithoutReview(TestConst.PHOTO_PATH);
         photoRepository.save(photo);
         return photo;
@@ -61,7 +59,7 @@ public class TestUtils {
     }
 
     public PointHistory createPointHistory() {
-        PointHistory pointHistory = new PointHistory(TestConst.POINT_TYPE, TestConst.POINT_ACTION, 1);
+        PointHistory pointHistory = new PointHistory(TestConst.POINT_TYPE, TestConst.POINT_ACTION, TestConst.POINT_VALUE);
         pointRepository.save(pointHistory);
         return pointHistory;
     }
