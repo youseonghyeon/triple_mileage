@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
+@Commit
 class ReviewControllerTest {
 
     @Autowired
@@ -39,14 +41,15 @@ class ReviewControllerTest {
         //given
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
-        Review review = testUtils.createReview(user, place);
+        UUID reviewId = UUID.randomUUID();
+//        Review review = testUtils.createReview(user, place);
         List<UUID> photoIds = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             Photo photo = testUtils.createPhoto();
             photoIds.add(photo.getId());
         }
 
-        EventDto eventDto = createEventDto(user, place, review, photoIds);
+        EventDto eventDto = createEventDto(user, place, reviewId, photoIds);
 
         //then
         mockMvc.perform(post("/events")
@@ -54,13 +57,14 @@ class ReviewControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+
     }
 
-    private EventDto createEventDto(User user, Place place, Review review, List<UUID> photoIds) {
+    private EventDto createEventDto(User user, Place place, UUID reviewId, List<UUID> photoIds) {
         EventDto eventDto = new EventDto();
         eventDto.setType(EventType.REVIEW);
         eventDto.setAction(EventAction.ADD);
-        eventDto.setReviewId(review.getId());
+        eventDto.setReviewId(reviewId);
         eventDto.setContent(TestConst.REVIEW_CONTENT);
         eventDto.setAttachedPhotoIds(photoIds);
         eventDto.setUserId(user.getId());

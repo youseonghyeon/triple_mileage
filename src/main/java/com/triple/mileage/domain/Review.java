@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -29,9 +30,24 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "place_id")
     private Place place;
 
+    @OneToMany(mappedBy = "review")
+    private List<Photo> photos;
+
     public Review(String content, User reviewer, Place place) {
         this.content = content;
         this.reviewer = reviewer;
         this.place = place;
+    }
+
+    public Review(UUID id, String content, User reviewer, Place place) {
+        this.id = id;
+        this.content = content;
+        this.reviewer = reviewer;
+        this.place = place;
+    }
+
+    public void modify(String content, List<Photo> photos) {
+        this.content = content;
+        this.photos = photos;
     }
 }
