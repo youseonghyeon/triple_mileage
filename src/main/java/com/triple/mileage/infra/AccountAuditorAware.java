@@ -1,4 +1,4 @@
-package com.triple.infra;
+package com.triple.mileage.infra;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.AuditorAware;

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * DDL 작성 및 테스트를 위한 도메인테스트
  */
 @SpringBootTest
+@Transactional
 class DomainTest {
 
 
@@ -41,9 +43,9 @@ class DomainTest {
     @AfterEach
     void reset() {
         photoRepository.deleteAll();
+        pointRepository.deleteAll();
         reviewRepository.deleteAll();
         placeRepository.deleteAll();
-        pointRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -52,12 +54,13 @@ class DomainTest {
     void createUser() {
         //when
         User user = testUtils.createUser();
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
         //then
-        assertNotNull(user.getId());
-        assertEquals(user.getId().getClass(), UUID.class);
-        assertEquals(user.getMileage(), 0);
-        assertNotNull(user.getCreatedDate());
-        assertNotNull(user.getModifiedDate());
+        assertNotNull(findUser.getId());
+        assertEquals(findUser.getId().getClass(), UUID.class);
+        assertEquals(findUser.getMileage(), 0);
+        assertNotNull(findUser.getCreatedDate());
+        assertNotNull(findUser.getModifiedDate());
     }
 
     @Test
@@ -68,14 +71,15 @@ class DomainTest {
         Place place = testUtils.createPlace();
         //when
         Review review = testUtils.createReview(user, place);
+        Review findReview = reviewRepository.findById(review.getId()).orElseThrow();
         //then
-        assertNotNull(review.getId());
-        assertEquals(review.getId().getClass(), UUID.class);
-        assertEquals(review.getContent(), TestConst.REVIEW_CONTENT);
-        assertNotNull(review.getCreatedDate());
-        assertNotNull(review.getModifiedDate());
-        assertEquals(review.getPlace(), place);
-        assertEquals(review.getReviewer(), user);
+        assertNotNull(findReview.getId());
+        assertEquals(findReview.getId().getClass(), UUID.class);
+        assertEquals(findReview.getContent(), TestConst.REVIEW_CONTENT);
+        assertNotNull(findReview.getCreatedDate());
+        assertNotNull(findReview.getModifiedDate());
+        assertEquals(findReview.getPlace(), place);
+        assertEquals(findReview.getReviewer(), user);
     }
 
     @Test
@@ -138,13 +142,11 @@ class DomainTest {
         //then
         assertNotNull(pointHistory.getId());
         assertEquals(pointHistory.getId().getClass(), UUID.class);
-        assertEquals(pointHistory.getAction(), TestConst.POINT_ACTION);
-        assertEquals(pointHistory.getType(), TestConst.POINT_TYPE);
+        assertEquals(pointHistory.getAction(), EventAction.valueOf(TestConst.POINT_ACTION));
+        assertEquals(pointHistory.getType(), EventType.valueOf(TestConst.POINT_TYPE));
         assertEquals(pointHistory.getValue(), TestConst.POINT_VALUE);
         assertNotNull(pointHistory.getCreatedDate());
         assertNotNull(pointHistory.getModifiedDate());
-        assertNull(pointHistory.getCreatedBy());
-        assertNull(pointHistory.getModifiedBy());
     }
 
 }

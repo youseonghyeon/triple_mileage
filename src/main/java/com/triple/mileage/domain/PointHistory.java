@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointHistory extends BaseEntity {
+public class PointHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -27,28 +27,26 @@ public class PointHistory extends BaseEntity {
 
     private int value;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
-    private Review review;
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User receiver;
 
-    public PointHistory(Review review, String type, String action, int value) {
-        this.review = review;
-        this.receiver = review.getReviewer();
+    public PointHistory(UUID reviewId, User user, String type, String action, int value) {
+        this.reviewId = reviewId;
+        this.receiver = user;
         this.type = EventType.valueOf(type);
         this.action = EventAction.valueOf(action);
         this.value = value;
     }
 
-    public PointHistory(Review review, EventType type, EventAction action, int value) {
-        this.review = review;
-        this.receiver = review.getReviewer();
+    public PointHistory(UUID reviewId,User user, EventType type, EventAction action, int value) {
+        this.reviewId = reviewId;
+        this.receiver = user;
         this.type = type;
         this.action = action;
-        this.review = review;
         this.value = value;
     }
 }

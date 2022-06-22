@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,38 +28,46 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final PlaceRepository placeRepository;
     private final PhotoRepository photoRepository;
-    private final PointService pointService;
     private final PointRepository pointRepository;
+    private final PointService pointService;
 
 
     public UUID addReview(EventDto eventDto) {
+        // 저장할 값 조회
         User user = userRepository.findById(eventDto.getUserId()).orElseThrow();
-        Review review = saveReview(user, eventDto);
-
+        Place place = placeRepository.findById(eventDto.getPlaceId()).orElseThrow();
+        String content = eventDto.getContent();
+        List<UUID> attachedPhotoIds = eventDto.getAttachedPhotoIds();
+        List<Photo> photos = new ArrayList<>();
+        if (!attachedPhotoIds.isEmpty()) {
+            photos.addAll(photoRepository.findAllById(attachedPhotoIds));
+        }
+        // 마일리지 계산
         int mileage = 0;
-        if (!eventDto.getContent().isEmpty()) {
+        if (StringUtils.hasText(content)) {
             mileage += 1;
         }
-        if (firstCustomer(eventDto)) {
+        if (firstCustomer(place.getId())) {
             mileage += 1;
         }
-        if (!eventDto.getAttachedPhotoIds().isEmpty()) {
+        if (!photos.isEmpty()) {
             mileage += 1;
         }
 
+        Review review = saveReview(eventDto.getReviewId(), user, content, place, photos);
         if (mileage != 0) {
-            pointService.saveAndGiveMileage(review, eventDto.getType(), eventDto.getAction(), mileage);
+            pointService.saveAndGiveMileage(user, review, eventDto.getType(), eventDto.getAction(), mileage);
         }
         return review.getId();
     }
 
 
     public UUID modifyReview(EventDto eventDto) {
-        Review review = reviewRepository.findWithPhotosById(eventDto.getReviewId());
-        int before = review.getPhotos().size(); // 수정 전 사진 개수
-        int after = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
+        Review review = reviewRepository.findById(eventDto.getReviewId()).orElseThrow();
         List<Photo> photos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
 
+        int before = review.getPhotos().size(); // 수정 전 사진 개수
+        int after = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
         review.modify(eventDto.getContent(), photos);
 
         int mileage = 0;
@@ -68,34 +78,25 @@ public class ReviewService {
         }
 
         if (mileage != 0) {
-            pointService.saveAndGiveMileage(review, eventDto.getType(), eventDto.getAction(), mileage);
+            pointService.saveAndGiveMileage(review.getReviewer(), review, eventDto.getType(), eventDto.getAction(), mileage);
         }
         return review.getId();
     }
 
     public void deleteReview(EventDto eventDto) {
         Review review = reviewRepository.findById(eventDto.getReviewId()).orElseThrow();
-        PointHistory pointHistory = pointRepository.findByReviewIdAndReceiverId(review.getId(), review.getReviewer().getId());
-        if (pointHistory == null) {
-            log.info("포인트 내역이 없음 reviewId={}", review.getId());
-            throw new RuntimeException("포인트 내역이 존재하지 않습니다.");
+        int pointSum = pointRepository.findSumByPlaceIdAndUserId(eventDto.getPlaceId(), eventDto.getUserId());
+        if (pointSum > 0) {
+            pointService.saveAndGiveMileage(review.getReviewer(), review, eventDto.getType(), eventDto.getAction(), pointSum * -1);
         }
-        int mileage = pointHistory.getValue();
-        pointService.saveAndGiveMileage(review, eventDto.getType(), eventDto.getAction(), mileage * (-1));
         reviewRepository.delete(review);
     }
 
 
-    private boolean firstCustomer(EventDto eventDto) {
-        return !reviewRepository.existsByPlaceId(eventDto.getPlaceId());
+    private boolean firstCustomer(UUID placeId) {
+        return !reviewRepository.existsByPlaceId(placeId);
     }
 
-    private Review saveReview(User reviewer, EventDto eventDto) {
-        Place place = placeRepository.findById(eventDto.getPlaceId()).orElseThrow();
-        Review review = new Review(eventDto.getReviewId(), eventDto.getContent(), reviewer, place);
-        reviewRepository.save(review);
-        return review;
-    }
 
     private boolean addFirstPhoto(int before, int after) {
         return before == 0 && after > 0;
@@ -105,5 +106,11 @@ public class ReviewService {
         return before > 0 && after == 0;
     }
 
+
+    private Review saveReview(UUID id, User reviewer, String content, Place place, List<Photo> photos) {
+        Review review = new Review(id, reviewer, content, place, photos);
+        reviewRepository.save(review);
+        return review;
+    }
 
 }

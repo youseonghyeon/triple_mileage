@@ -50,7 +50,7 @@ public class TestUtils {
     }
 
     public Review createReview(User reviewer, Place place) {
-        Review review = new Review(TestConst.REVIEW_CONTENT, reviewer, place);
+        Review review = new Review(UUID.randomUUID(), TestConst.REVIEW_CONTENT, reviewer, place);
         reviewRepository.save(review);
         return review;
     }
@@ -74,7 +74,7 @@ public class TestUtils {
     }
 
     public PointHistory createPointHistory(Review review) {
-        PointHistory pointHistory = new PointHistory(review, TestConst.POINT_TYPE, TestConst.POINT_ACTION, TestConst.POINT_VALUE);
+        PointHistory pointHistory = new PointHistory(review.getId(), review.getReviewer(), TestConst.POINT_TYPE, TestConst.POINT_ACTION, TestConst.POINT_VALUE);
         pointRepository.save(pointHistory);
         return pointHistory;
     }

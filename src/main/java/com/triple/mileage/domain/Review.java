@@ -15,8 +15,6 @@ import java.util.UUID;
 public class Review extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "review_id", columnDefinition = "BINARY(16)")
     private UUID id;
 
@@ -26,24 +24,27 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User reviewer;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
     private Place place;
 
     @OneToMany(mappedBy = "review")
     private List<Photo> photos;
 
-    public Review(String content, User reviewer, Place place) {
-        this.content = content;
-        this.reviewer = reviewer;
-        this.place = place;
-    }
 
     public Review(UUID id, String content, User reviewer, Place place) {
         this.id = id;
         this.content = content;
         this.reviewer = reviewer;
         this.place = place;
+    }
+
+    public Review(UUID id, User reviewer, String content, Place place, List<Photo> photos) {
+        this.id = id;
+        this.content = content;
+        this.reviewer = reviewer;
+        this.place = place;
+        this.photos = photos;
     }
 
     public void modify(String content, List<Photo> photos) {

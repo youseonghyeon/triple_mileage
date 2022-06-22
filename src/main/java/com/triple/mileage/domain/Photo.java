@@ -22,7 +22,6 @@ public class Photo extends BaseEntity {
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
     private Review review;
 
     public static Photo createPhoto(String path, Review review) {
@@ -37,5 +36,9 @@ public class Photo extends BaseEntity {
         Photo p = new Photo();
         p.path = path;
         return p;
+    }
+
+    public void setReview(Review review) {
+        this.review = review;
     }
 }
