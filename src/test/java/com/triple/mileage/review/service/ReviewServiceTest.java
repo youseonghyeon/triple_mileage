@@ -2,13 +2,14 @@ package com.triple.mileage.review.service;
 
 import com.triple.mileage.TestConst;
 import com.triple.mileage.TestUtils;
-import com.triple.mileage.domain.*;
-import com.triple.mileage.place.repository.PlaceRepository;
-import com.triple.mileage.point.repository.PointRepository;
-import com.triple.mileage.review.dto.EventDto;
-import com.triple.mileage.review.repository.PhotoRepository;
-import com.triple.mileage.review.repository.ReviewRepository;
-import com.triple.mileage.user.repository.UserRepository;
+import com.triple.mileage.module.domain.*;
+import com.triple.mileage.module.place.repository.PlaceRepository;
+import com.triple.mileage.module.point.repository.PointRepository;
+import com.triple.mileage.module.review.dto.EventDto;
+import com.triple.mileage.module.review.repository.PhotoRepository;
+import com.triple.mileage.module.review.repository.ReviewRepository;
+import com.triple.mileage.module.review.service.ReviewService;
+import com.triple.mileage.module.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,6 +42,8 @@ class ReviewServiceTest {
     PlaceRepository placeRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    EntityManager em;
 
     @AfterEach
     void reset() {
@@ -48,7 +52,6 @@ class ReviewServiceTest {
         reviewRepository.deleteAll();
         placeRepository.deleteAll();
         userRepository.deleteAll();
-
     }
 
     @Test
@@ -63,19 +66,20 @@ class ReviewServiceTest {
         UUID uuid = reviewService.addReview(eventDto);
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
-        assertEquals(user, review.getReviewer());
+        assertEquals(user.getId(), review.getReviewer().getId());
         assertEquals(TestConst.REVIEW_CONTENT, review.getContent());
-        assertEquals(place, review.getPlace());
+        assertEquals(place.getId(), review.getPlace().getId());
         assertEquals(0, review.getPhotos().size());
         assertNotNull(review.getCreatedDate());
         assertNotNull(review.getModifiedDate());
         //then
         PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
-        assertEquals(2, user.getMileage());
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
+        assertEquals(2, findUser.getMileage());
         assertEquals(2, history.getValue());
         assertEquals(EventType.valueOf(TestConst.POINT_TYPE), history.getType());
         assertEquals(EventAction.valueOf(TestConst.POINT_ACTION), history.getAction());
-        assertEquals(user, history.getReceiver());
+        assertEquals(user.getId(), history.getReceiver().getId());
         assertNotNull(history.getCreatedDate());
         assertNotNull(history.getModifiedDate());
     }
@@ -93,19 +97,20 @@ class ReviewServiceTest {
         UUID uuid = reviewService.addReview(eventDto);
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
-        assertEquals(user, review.getReviewer());
+        assertEquals(user.getId(), review.getReviewer().getId());
         assertEquals(TestConst.REVIEW_CONTENT, review.getContent());
-        assertEquals(place, review.getPlace());
+        assertEquals(place.getId(), review.getPlace().getId());
         assertEquals(1, review.getPhotos().size());
         assertNotNull(review.getCreatedDate());
         assertNotNull(review.getModifiedDate());
         //then
         PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
-        assertEquals(3, user.getMileage());
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
+        assertEquals(3, findUser.getMileage());
         assertEquals(3, history.getValue());
         assertEquals(EventType.valueOf(TestConst.POINT_TYPE), history.getType());
         assertEquals(EventAction.valueOf(TestConst.POINT_ACTION), history.getAction());
-        assertEquals(user, history.getReceiver());
+        assertEquals(user.getId(), history.getReceiver().getId());
         assertNotNull(history.getCreatedDate());
         assertNotNull(history.getModifiedDate());
     }
@@ -127,19 +132,20 @@ class ReviewServiceTest {
         UUID uuid = reviewService.addReview(eventDto);
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
-        assertEquals(user, review.getReviewer());
+        assertEquals(user.getId(), review.getReviewer().getId());
         assertEquals(TestConst.REVIEW_CONTENT, review.getContent());
-        assertEquals(place, review.getPlace());
+        assertEquals(place.getId(), review.getPlace().getId());
         assertEquals(1, review.getPhotos().size());
         assertNotNull(review.getCreatedDate());
         assertNotNull(review.getModifiedDate());
         //then
         PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
-        assertEquals(2, user.getMileage());
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
+        assertEquals(2, findUser.getMileage());
         assertEquals(2, history.getValue());
         assertEquals(EventType.valueOf(TestConst.POINT_TYPE), history.getType());
         assertEquals(EventAction.valueOf(TestConst.POINT_ACTION), history.getAction());
-        assertEquals(user, history.getReceiver());
+        assertEquals(user.getId(), history.getReceiver().getId());
         assertNotNull(history.getCreatedDate());
         assertNotNull(history.getModifiedDate());
     }
@@ -168,9 +174,10 @@ class ReviewServiceTest {
         assertEquals(1, review.getPhotos().size());
         //then
         List<PointHistory> histories = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId());
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(2, histories.size());
         PointHistory history = histories.get(1);
-        assertEquals(3, user.getMileage()); // 2 + 1점
+        assertEquals(3, findUser.getMileage()); // 2 + 1점
         assertEquals(2, histories.get(0).getValue());
         assertEquals(1, history.getValue()); // 1점 추가
     }
@@ -198,8 +205,9 @@ class ReviewServiceTest {
         assertEquals(0, review.getPhotos().size());
         //then
         List<PointHistory> histories = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId());
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(2, histories.size());
-        assertEquals(2, user.getMileage()); // 3 - 1점
+        assertEquals(2, findUser.getMileage()); // 3 - 1점
         assertEquals(3, histories.get(0).getValue());
         assertEquals(-1, histories.get(1).getValue()); // 1점 제거
     }
