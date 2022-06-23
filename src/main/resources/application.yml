@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: test
+    active: dev
   datasource:
     url: jdbc:mysql://localhost:3306/mileage
     username: market_test
@@ -8,11 +8,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
         use_sql_comments: true
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+      schema-locations: classpath:db/schema.sql
 
 logging:
   level:

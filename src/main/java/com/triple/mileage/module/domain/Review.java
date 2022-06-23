@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,8 +28,8 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE)
-    private List<Photo> photos;
+    @OneToMany(mappedBy = "review")
+    private List<Photo> photos = new ArrayList<>();
 
 
     public Review(UUID id, String content, User reviewer, Place place) {
@@ -38,16 +39,14 @@ public class Review extends BaseTimeEntity {
         this.place = place;
     }
 
-    public Review(UUID id, User reviewer, String content, Place place, List<Photo> photos) {
+    public Review(UUID id, User reviewer, String content, Place place) {
         this.id = id;
         this.content = content;
         this.reviewer = reviewer;
         this.place = place;
-        this.photos = photos;
     }
 
-    public void modify(String content, List<Photo> photos) {
+    public void modify(String content) {
         this.content = content;
-        this.photos = photos;
     }
 }

@@ -2,7 +2,6 @@ package com.triple.mileage.module.point.dto;
 
 import com.triple.mileage.module.domain.EventAction;
 import com.triple.mileage.module.domain.EventType;
-import com.triple.mileage.module.domain.PointHistory;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -17,11 +16,13 @@ public class PointHistoryDto {
     private UUID reviewId;
     private LocalDateTime date;
 
-    public PointHistoryDto(PointHistory pointHistory) {
-        this.type = pointHistory.getType();
-        this.action = pointHistory.getAction();
-        this.value = pointHistory.getValue();
-        this.reviewId = pointHistory.getReviewId();
-        this.date = pointHistory.getCreatedDate();
+
+    public PointHistoryDto(EventType type, EventAction action, int value, UUID reviewId, LocalDateTime date) {
+        this.type = type;
+        this.action = action;
+        this.value = value;
+        this.reviewId = reviewId;
+        this.date = date;
     }
+
 }

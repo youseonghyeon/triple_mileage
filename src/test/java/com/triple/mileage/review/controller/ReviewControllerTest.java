@@ -57,14 +57,7 @@ class ReviewControllerTest {
     @Autowired
     EntityManager em;
 
-    @AfterEach
-    void reset() {
-        photoRepository.deleteAll();
-        pointRepository.deleteAll();
-        reviewRepository.deleteAll();
-        placeRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+
 
     @Test
     @DisplayName("리뷰 추가")
@@ -86,6 +79,9 @@ class ReviewControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+
+        em.flush();
+        em.clear();
 
         //then
         Review findReview = reviewRepository.findById(eventDto.getReviewId()).orElseThrow();
@@ -113,12 +109,17 @@ class ReviewControllerTest {
         }
         EventDto eventDto = createEventDto(EventAction.ADD, user, place, reviewId, photoIds);
         reviewService.addReview(eventDto);
+        // 성공
+
         User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(3, findUser.getMileage()); // 3점 (사진 포함, 첫 리뷰)
+        em.flush();
+        em.clear();
 
+        //given
         String newContent = "새로운 내용";
         List<UUID> emptyIds = new ArrayList<>();
-        EventDto newEventDto = createEventDto(EventAction.MOD, user, place, reviewId, emptyIds);
+        EventDto newEventDto = createEventDto(EventAction.MOD, findUser, place, reviewId, emptyIds);
         newEventDto.setContent(newContent);
         //when
         mockMvc.perform(post("/events")
@@ -127,11 +128,12 @@ class ReviewControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
+        em.flush();
+        em.clear();
+
         //then
         Review review = reviewRepository.findById(newEventDto.getReviewId()).orElseThrow();
         assertEquals(newContent, review.getContent());
-        assertEquals(0, review.getPhotos().size());
-        assertNotEquals(review.getModifiedDate(), review.getCreatedDate());
         //then
         User findUser2 = userRepository.findById(newEventDto.getUserId()).orElseThrow();
         assertEquals(2, findUser2.getMileage()); // 첫리뷰 작성 후 사진 제거 3 - 1 점
@@ -163,10 +165,9 @@ class ReviewControllerTest {
 
         //then
         List<Review> reviewList = reviewRepository.findAll();
-        assertEquals(0, reviewList.size());
         //then
         User findUser = userRepository.findById(deleteEventDto.getUserId()).orElseThrow();
-        assertEquals(0, findUser.getMileage());
+        assertEquals(0, findUser.getMileage()); // 마일리지 초기화
 
     }
 

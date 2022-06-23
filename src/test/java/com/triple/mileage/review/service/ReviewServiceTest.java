@@ -4,6 +4,7 @@ import com.triple.mileage.TestConst;
 import com.triple.mileage.TestUtils;
 import com.triple.mileage.module.domain.*;
 import com.triple.mileage.module.place.repository.PlaceRepository;
+import com.triple.mileage.module.point.dto.PointHistoryDto;
 import com.triple.mileage.module.point.repository.PointRepository;
 import com.triple.mileage.module.review.dto.EventDto;
 import com.triple.mileage.module.review.repository.PhotoRepository;
@@ -44,14 +45,7 @@ class ReviewServiceTest {
     @Autowired
     EntityManager em;
 
-    @AfterEach
-    void reset() {
-        photoRepository.deleteAll();
-        pointRepository.deleteAll();
-        reviewRepository.deleteAll();
-        placeRepository.deleteAll();
-        userRepository.deleteAll();
-    }
+
 
     @Test
     @DisplayName("첫번째 리뷰 추가(사진 미포함)")
@@ -86,6 +80,11 @@ class ReviewServiceTest {
     @Test
     @DisplayName("첫번째 리뷰 추가(사진 1개 포함)")
     void addFirstReviewWithPhoto() {
+        /**
+         * 첫번째 리뷰 2점
+         * 사진 추가 1점
+         * 총 3점
+         */
         //given
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
@@ -94,6 +93,9 @@ class ReviewServiceTest {
         EventDto eventDto = createEventDto(user, place, photo);
         //when
         UUID uuid = reviewService.addReview(eventDto);
+        em.flush();
+        em.clear();
+
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
         assertEquals(user.getId(), review.getReviewer().getId());
@@ -133,6 +135,9 @@ class ReviewServiceTest {
         EventDto eventDto = createEventDto(user, place, photo);
         //when
         UUID uuid = reviewService.addReview(eventDto);
+        em.flush();
+        em.clear();
+
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
         assertEquals(user.getId(), review.getReviewer().getId());
@@ -198,14 +203,21 @@ class ReviewServiceTest {
         Photo photo = testUtils.createPhoto();
         EventDto eventDto = createEventDto(user, place, photo);
         UUID uuid = reviewService.addReview(eventDto);
+        em.flush();
+        em.clear();
+
         String newContent = "수정된 내용";
         EventDto modifyEventDto = createModEventDto(uuid, user, place, null, newContent);
         //when
         reviewService.modifyReview(modifyEventDto);
+        em.flush();
+        em.clear();
+
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
         assertEquals(newContent, review.getContent());
         assertEquals(0, review.getPhotos().size());
+
         //then
         List<PointHistory> histories = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId());
         User findUser = userRepository.findById(user.getId()).orElseThrow();
@@ -229,15 +241,20 @@ class ReviewServiceTest {
         Photo photo = testUtils.createPhoto();
         EventDto eventDto = createEventDto(user, place, photo);
         UUID uuid = reviewService.addReview(eventDto);
+        em.flush();
+        em.clear();
+
         String newContent = "수정된 내용";
         EventDto modifyEventDto = createModEventDto(uuid, user, place, null, newContent);
         reviewService.modifyReview(modifyEventDto);
         EventDto deleteEventDto = createDeleteEventDto(uuid, user, place);
         //when
-        reviewService.deleteReview(modifyEventDto);
+        reviewService.deleteReview(deleteEventDto);
+        em.flush();
+        em.clear();
+
         //then
-        List<PointHistory> histories = pointRepository.findByReceiverIdOrderByCreatedDateAsc(user.getId());
-        //then
+        List<PointHistoryDto> histories = pointRepository.findHistoryDto(user.getId());
         assertEquals(3, histories.size());
         assertEquals(3, histories.get(0).getValue()); // 3점 추가
         assertEquals(-1, histories.get(1).getValue()); // 1점 제거

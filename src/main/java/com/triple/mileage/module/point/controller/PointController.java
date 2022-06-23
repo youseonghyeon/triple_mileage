@@ -4,6 +4,7 @@ import com.triple.mileage.module.domain.User;
 import com.triple.mileage.module.point.dto.HistoryRes;
 import com.triple.mileage.module.point.dto.PointHistoryDto;
 import com.triple.mileage.module.point.dto.PointRes;
+import com.triple.mileage.module.point.repository.PointRepository;
 import com.triple.mileage.module.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class PointController {
 
     private final UserRepository userRepository;
+    private final PointRepository pointRepository;
 
     // 포인트 조회
     @GetMapping("/point/{userId}")
@@ -31,12 +32,10 @@ public class PointController {
     // 포인트 내역 조회
     @GetMapping("/history/{userId}")
     public HistoryRes pointHistoryList(@PathVariable("userId") UUID userId) {
-        User user = userRepository.findWithPointHistoryByIdOrderByCreatedDateAsc(userId);
-        List<PointHistoryDto> dtoList = user.getPointHistories()
-                .stream()
-                .map(PointHistoryDto::new)
-                .collect(Collectors.toList());
+        User user = userRepository.findById(userId).orElseThrow();
+        List<PointHistoryDto> historyDto = pointRepository.findHistoryDto(userId);
 
-        return new HistoryRes(user.getMileage(),dtoList);
+        return new HistoryRes(user.getMileage(), historyDto);
     }
+
 }

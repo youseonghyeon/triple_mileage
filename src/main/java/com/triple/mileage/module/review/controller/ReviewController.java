@@ -11,10 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.UUID;
@@ -29,20 +28,22 @@ public class ReviewController {
     private final DataInitializer dataInitializer;
 
     @ExceptionHandler(ReviewLimitException.class)
-    public Res reviewLimitExHandler(ReviewLimitException e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Res reviewLimitEkxHandler(ReviewLimitException e) {
         return new Res("fail", e.getMessage());
     }
 
 
     @PostMapping("/events")
-    public Res eventHandler(@RequestBody @Valid EventDto eventDto) {
+    public ResponseEntity eventHandler(@RequestBody @Valid EventDto eventDto) {
         // mockData 생성 메서드
         dataInitializer.init(eventDto);
 
         if (eventDto.getType().equals(EventType.REVIEW)) {
             reviewHandler(eventDto);
         }
-        return new Res("success");
+
+        return ResponseEntity.ok().body(new Res("success"));
     }
 
     private void reviewHandler(EventDto eventDto) {
@@ -63,7 +64,12 @@ public class ReviewController {
     private void reviewLimitValidator(EventDto eventDto) {
         UUID userId = eventDto.getUserId();
         UUID placeId = eventDto.getPlaceId();
+        if (reviewRepository.existsById(eventDto.getReviewId())) {
+            // reviewId 중복
+            throw new ReviewLimitException("이미 등록된 리뷰가 존재합니다.");
+        }
         if (reviewRepository.existsByPlaceIdAndReviewerId(placeId, userId)) {
+            // 리뷰 개수 제한
             throw new ReviewLimitException("이미 등록된 리뷰가 존재합니다.");
         }
     }

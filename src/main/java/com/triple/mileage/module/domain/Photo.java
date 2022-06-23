@@ -20,6 +20,7 @@ public class Photo extends BaseTimeEntity {
     private String path;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
     private Review review;
 
     public static Photo createPhoto(UUID photoId, String path, Review review) {
@@ -39,5 +40,8 @@ public class Photo extends BaseTimeEntity {
 
     public void setReview(Review review) {
         this.review = review;
+        if (review != null) {
+            review.getPhotos().add(this);
+        }
     }
 }

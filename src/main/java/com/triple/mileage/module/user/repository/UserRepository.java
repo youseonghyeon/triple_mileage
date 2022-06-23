@@ -11,6 +11,4 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    @EntityGraph(attributePaths = "pointHistories", type = EntityGraph.EntityGraphType.FETCH)
-    User findWithPointHistoryByIdOrderByCreatedDateAsc(UUID userId);
 }
