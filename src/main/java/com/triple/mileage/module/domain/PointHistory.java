@@ -30,24 +30,23 @@ public class PointHistory extends BaseTimeEntity {
     @Column(columnDefinition = "BINARY(16)")
     private UUID reviewId;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User receiver;
 
     public PointHistory(UUID reviewId, User user, String type, String action, int value) {
         this.reviewId = reviewId;
-        this.receiver = user;
         this.type = EventType.valueOf(type);
         this.action = EventAction.valueOf(action);
         this.value = value;
+        this.receiver = user;
     }
 
     public PointHistory(UUID reviewId, User user, EventType type, EventAction action, int value) {
         this.reviewId = reviewId;
-        this.receiver = user;
         this.type = type;
         this.action = action;
         this.value = value;
+        this.receiver = user;
     }
 }

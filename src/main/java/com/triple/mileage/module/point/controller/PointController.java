@@ -20,6 +20,7 @@ public class PointController {
 
     private final UserRepository userRepository;
 
+    // 포인트 조회
     @GetMapping("/point/{userId}")
     public PointRes currentPoint(@PathVariable("userId") UUID userId) {
         User user = userRepository.findById(userId).orElseThrow();
@@ -27,6 +28,7 @@ public class PointController {
         return new PointRes(mileage);
     }
 
+    // 포인트 내역 조회
     @GetMapping("/history/{userId}")
     public HistoryRes pointHistoryList(@PathVariable("userId") UUID userId) {
         User user = userRepository.findWithPointHistoryByIdOrderByCreatedDateAsc(userId);

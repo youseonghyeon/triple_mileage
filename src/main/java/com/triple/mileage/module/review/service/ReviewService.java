@@ -69,11 +69,11 @@ public class ReviewService {
         Review review = reviewRepository.findById(eventDto.getReviewId()).orElseThrow();
         List<Photo> photos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
 
+        int mileage = 0;
         int before = review.getPhotos().size(); // 수정 전 사진 개수
         int after = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
         review.modify(eventDto.getContent(), photos);
 
-        int mileage = 0;
         if (addFirstPhoto(before, after)) {
             mileage += 1;
         } else if (removeAllPhoto(before, after)) {

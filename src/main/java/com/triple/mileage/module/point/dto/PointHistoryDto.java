@@ -3,7 +3,6 @@ package com.triple.mileage.module.point.dto;
 import com.triple.mileage.module.domain.EventAction;
 import com.triple.mileage.module.domain.EventType;
 import com.triple.mileage.module.domain.PointHistory;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;

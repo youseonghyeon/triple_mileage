@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static com.triple.mileage.domain.QPlace.place;
-import static com.triple.mileage.domain.QPointHistory.pointHistory;
-import static com.triple.mileage.domain.QReview.review;
+import static com.triple.mileage.module.domain.QPlace.place;
+import static com.triple.mileage.module.domain.QPointHistory.pointHistory;
+import static com.triple.mileage.module.domain.QReview.review;
 
 @Repository
 @Transactional(readOnly = true)

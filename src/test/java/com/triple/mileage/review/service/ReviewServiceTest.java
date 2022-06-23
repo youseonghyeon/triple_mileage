@@ -21,8 +21,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -119,6 +118,10 @@ class ReviewServiceTest {
     @Test
     @DisplayName("두번째 리뷰 추가(사진 포함)")
     void addReviewWithPhoto() {
+        /**
+         * 두번째 리뷰 1점
+         * 사진 추가 1점
+         */
         //given
         User user2 = testUtils.createUser();
         Place place = testUtils.createPlace();
@@ -241,6 +244,47 @@ class ReviewServiceTest {
         assertEquals(-2, histories.get(2).getValue()); // 2점 제거
         assertEquals(0, user.getMileage()); // 3 -1 -2점
     }
+
+    @Test
+    @DisplayName("내용 없는 리뷰(사진 미포함)")
+    void noContentReview() {
+        /**
+         * 첫번째 리뷰   1점
+         * 내용(x)       0점
+         * 사진 미포함   0점
+         */
+        //given
+        User user = testUtils.createUser();
+        Place place = testUtils.createPlace();
+
+        EventDto eventDto = new EventDto();
+        eventDto.setReviewId(UUID.randomUUID());
+        eventDto.setType(EventType.REVIEW);
+        eventDto.setAction(EventAction.ADD);
+        eventDto.setUserId(user.getId());
+        eventDto.setPlaceId(place.getId());
+        //when
+        UUID uuid = reviewService.addReview(eventDto);
+        //then
+        Review review = reviewRepository.findById(uuid).orElseThrow();
+        assertEquals(user.getId(), review.getReviewer().getId());
+        assertNull(review.getContent());
+        assertEquals(place.getId(), review.getPlace().getId());
+        assertEquals(0, review.getPhotos().size());
+        assertNotNull(review.getCreatedDate());
+        assertNotNull(review.getModifiedDate());
+        //then
+        PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
+        User findUser = userRepository.findById(user.getId()).orElseThrow();
+        assertEquals(1, findUser.getMileage());
+        assertEquals(1, history.getValue());
+        assertEquals(EventType.valueOf(TestConst.POINT_TYPE), history.getType());
+        assertEquals(EventAction.valueOf(TestConst.POINT_ACTION), history.getAction());
+        assertEquals(user.getId(), history.getReceiver().getId());
+        assertNotNull(history.getCreatedDate());
+        assertNotNull(history.getModifiedDate());
+    }
+
 
     private EventDto createDeleteEventDto(UUID uuid, User user, Place place) {
         EventDto eventDto = new EventDto();

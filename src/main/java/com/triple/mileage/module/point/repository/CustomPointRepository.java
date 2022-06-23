@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface CustomPointRepository {
 
-    int findSumByPlaceIdAndUserId(UUID placeId, UUID userId);
-
     List<PointHistory> findByReviewIdAndUserId(UUID reviewId, UUID receiverId);
+
+    int findSumByPlaceIdAndUserId(UUID placeId, UUID userId);
 }

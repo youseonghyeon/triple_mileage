@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,12 +22,11 @@ public class User extends BaseTimeEntity {
     private int mileage = 0;
 
     @OneToMany(mappedBy = "receiver")
-    private List<PointHistory> pointHistories;
+    private List<PointHistory> pointHistories = new ArrayList<>();
 
     public User(UUID id) {
         this.id = id;
     }
-
 
     public void giveMileage(int mileage) {
         this.mileage += mileage;

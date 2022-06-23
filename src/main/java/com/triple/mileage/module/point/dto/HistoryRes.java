@@ -9,9 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 public class HistoryRes {
 
-    private int mileage;
+    private int totalMileage;
     private List<PointHistoryDto> history;
-
-
 
 }

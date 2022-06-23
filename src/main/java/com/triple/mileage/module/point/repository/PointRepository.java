@@ -12,6 +12,4 @@ public interface PointRepository extends JpaRepository<PointHistory, UUID>, Cust
 
     List<PointHistory> findByReceiverIdOrderByCreatedDateAsc(UUID userId);
 
-
-
 }

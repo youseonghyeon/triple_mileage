@@ -33,9 +33,12 @@ public class ReviewController {
         return new Res("fail", e.getMessage());
     }
 
+
     @PostMapping("/events")
     public Res eventHandler(@RequestBody @Valid EventDto eventDto) {
-        dataInitializer.init(eventDto); // 임시 데이터 생성 메서드
+        // mockData 생성 메서드
+        dataInitializer.init(eventDto);
+
         if (eventDto.getType().equals(EventType.REVIEW)) {
             reviewHandler(eventDto);
         }

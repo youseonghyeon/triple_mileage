@@ -6,7 +6,6 @@ import com.triple.mileage.module.domain.User;
 import com.triple.mileage.module.place.repository.PlaceRepository;
 import com.triple.mileage.module.review.dto.EventDto;
 import com.triple.mileage.module.review.repository.PhotoRepository;
-import com.triple.mileage.module.review.repository.ReviewRepository;
 import com.triple.mileage.module.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -25,6 +24,10 @@ public class DataInitializer {
     private final PlaceRepository placeRepository;
 
 
+    /**
+     * Post(/events) 수행을 위한 mock Data 구성
+     * @param eventDto
+     */
     public void init(EventDto eventDto) {
         UUID userId = eventDto.getUserId();
         if (!userRepository.existsById(userId)) {

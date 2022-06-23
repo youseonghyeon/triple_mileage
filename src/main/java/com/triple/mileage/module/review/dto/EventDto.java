@@ -18,7 +18,9 @@ public class EventDto {
     private EventAction action;
     @NotNull
     private UUID reviewId;
+
     private String content;
+
     private List<UUID> attachedPhotoIds = new ArrayList<>();
     @NotNull
     private UUID userId;
