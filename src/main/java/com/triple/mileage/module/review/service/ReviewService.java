@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,9 +40,7 @@ public class ReviewService {
 
 
     public void modifyReview(Review review, List<Photo> newPhotos, EventDto eventDto) {
-        int beforeCnt = review.getPhotos().size(); // 수정 전 사진 개수
-        int afterCnt = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
-        int mileage = mileagePolicy.modifyReviewMileage(beforeCnt, afterCnt);
+        int mileage = mileagePolicy.modifyReviewMileage(review, eventDto);
 
         review.modify(eventDto.getContent(), newPhotos);
 

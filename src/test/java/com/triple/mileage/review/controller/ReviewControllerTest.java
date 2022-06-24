@@ -163,9 +163,7 @@ class ReviewControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-
-        //then
-        List<Review> reviewList = reviewRepository.findAll();
+;
         //then
         User findUser = userRepository.findById(deleteEventDto.getUserId()).orElseThrow();
         assertEquals(0, findUser.getMileage()); // 마일리지 초기화
