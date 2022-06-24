@@ -32,33 +32,28 @@ public class TestUtils {
     public User createUser() {
         UUID uuid = UUID.randomUUID();
         User user = new User(uuid);
-        userRepository.saveAndFlush(user);
-        return user;
+        return userRepository.save(user);
     }
 
     public Review createReview(User reviewer, Place place) {
         Review review = new Review(UUID.randomUUID(), TestConst.REVIEW_CONTENT, reviewer, place);
-        reviewRepository.saveAndFlush(review);
-        return review;
+        return reviewRepository.saveAndFlush(review);
     }
 
     public Photo createPhoto() { // without review
         UUID uuid = UUID.randomUUID();
         Photo photo = Photo.createPhotoWithoutReview(uuid, TestConst.PHOTO_PATH);
-        photoRepository.saveAndFlush(photo);
-        return photo;
+        return photoRepository.save(photo);
     }
 
     public Place createPlace() {
         UUID uuid = UUID.randomUUID();
         Place place = new Place(uuid, TestConst.ADDRESS);
-        placeRepository.saveAndFlush(place);
-        return place;
+        return placeRepository.save(place);
     }
 
     public PointHistory createPointHistory(Review review) {
         PointHistory pointHistory = new PointHistory(review.getId(), review.getReviewer(), TestConst.POINT_TYPE, TestConst.POINT_ACTION, TestConst.POINT_VALUE);
-        pointRepository.saveAndFlush(pointHistory);
-        return pointHistory;
+        return pointRepository.save(pointHistory);
     }
 }

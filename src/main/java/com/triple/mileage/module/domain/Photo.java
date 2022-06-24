@@ -23,13 +23,6 @@ public class Photo extends BaseTimeEntity {
     @JoinColumn(name = "review_id")
     private Review review;
 
-    public static Photo createPhoto(UUID photoId, String path, Review review) {
-        Photo photo = new Photo();
-        photo.id = photoId;
-        photo.path = path;
-        photo.review = review;
-        return photo;
-    }
 
     public static Photo createPhotoWithoutReview(UUID photoId, String path) {
         Photo photo = new Photo();

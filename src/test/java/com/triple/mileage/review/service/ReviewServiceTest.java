@@ -11,7 +11,6 @@ import com.triple.mileage.module.review.repository.PhotoRepository;
 import com.triple.mileage.module.review.repository.ReviewRepository;
 import com.triple.mileage.module.review.service.ReviewService;
 import com.triple.mileage.module.user.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +46,6 @@ class ReviewServiceTest {
     EntityManager em;
 
 
-
     @Test
     @DisplayName("첫번째 리뷰 추가(사진 미포함)")
     void addFirstReview() {
@@ -56,7 +55,7 @@ class ReviewServiceTest {
 
         EventDto eventDto = createEventDto(user, place, null);
         //when
-        UUID uuid = reviewService.addReview(eventDto);
+        UUID uuid = reviewService.addReview(user, place, new ArrayList<>(), eventDto);
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
         assertEquals(user.getId(), review.getReviewer().getId());
@@ -89,10 +88,12 @@ class ReviewServiceTest {
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
         Photo photo = testUtils.createPhoto();
+        List<Photo> photos = new ArrayList<>();
+        photos.add(photo);
 
         EventDto eventDto = createEventDto(user, place, photo);
         //when
-        UUID uuid = reviewService.addReview(eventDto);
+        UUID uuid = reviewService.addReview(user, place, photos, eventDto);
         em.flush();
         em.clear();
 
@@ -129,14 +130,14 @@ class ReviewServiceTest {
         Place place = testUtils.createPlace();
         User user = testUtils.createUser();
         Photo photo = testUtils.createPhoto();
+        List<Photo> photos = new ArrayList<>();
+        photos.add(photo);
         // 첫번째 mock review
         testUtils.createReview(user2, place);
 
         EventDto eventDto = createEventDto(user, place, photo);
         //when
-        UUID uuid = reviewService.addReview(eventDto);
-        em.flush();
-        em.clear();
+        UUID uuid = reviewService.addReview(user, place, photos, eventDto);
 
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
@@ -170,12 +171,17 @@ class ReviewServiceTest {
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
         EventDto eventDto = createEventDto(user, place, null);
-        UUID uuid = reviewService.addReview(eventDto);
+        UUID uuid = reviewService.addReview(user, place, new ArrayList<>(), eventDto);
+        Review findReview = reviewRepository.findById(uuid).orElseThrow();
+
+
         Photo photo = testUtils.createPhoto();
+        List<Photo> newPhotos = new ArrayList<>();
+        newPhotos.add(photo);
         String newContent = "수정된 내용";
         EventDto modifyEventDto = createModEventDto(uuid, user, place, photo, newContent);
         //when
-        reviewService.modifyReview(modifyEventDto);
+        reviewService.modifyReview(findReview, newPhotos, modifyEventDto);
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
         assertEquals(newContent, review.getContent());
@@ -201,15 +207,18 @@ class ReviewServiceTest {
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
         Photo photo = testUtils.createPhoto();
+        List<Photo> photos = new ArrayList<>();
+        photos.add(photo);
         EventDto eventDto = createEventDto(user, place, photo);
-        UUID uuid = reviewService.addReview(eventDto);
-        em.flush();
-        em.clear();
+        UUID uuid = reviewService.addReview(user, place, photos, eventDto);
+        Review findReview = reviewRepository.findById(uuid).orElseThrow();
+
 
         String newContent = "수정된 내용";
         EventDto modifyEventDto = createModEventDto(uuid, user, place, null, newContent);
         //when
-        reviewService.modifyReview(modifyEventDto);
+        reviewService.modifyReview(findReview, new ArrayList<>(), modifyEventDto);
+
         em.flush();
         em.clear();
 
@@ -239,17 +248,19 @@ class ReviewServiceTest {
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
         Photo photo = testUtils.createPhoto();
+        List<Photo> photos = new ArrayList<>();
+        photos.add(photo);
         EventDto eventDto = createEventDto(user, place, photo);
-        UUID uuid = reviewService.addReview(eventDto);
-        em.flush();
-        em.clear();
+        UUID uuid = reviewService.addReview(user, place, photos, eventDto);
+        Review findReview = reviewRepository.findById(uuid).orElseThrow();
+
 
         String newContent = "수정된 내용";
         EventDto modifyEventDto = createModEventDto(uuid, user, place, null, newContent);
-        reviewService.modifyReview(modifyEventDto);
+        reviewService.modifyReview(findReview, new ArrayList<>(), modifyEventDto);
         EventDto deleteEventDto = createDeleteEventDto(uuid, user, place);
         //when
-        reviewService.deleteReview(deleteEventDto);
+        reviewService.deleteReview(findReview, deleteEventDto);
         em.flush();
         em.clear();
 
@@ -281,7 +292,7 @@ class ReviewServiceTest {
         eventDto.setUserId(user.getId());
         eventDto.setPlaceId(place.getId());
         //when
-        UUID uuid = reviewService.addReview(eventDto);
+        UUID uuid = reviewService.addReview(user, place, new ArrayList<>(), eventDto);
         //then
         Review review = reviewRepository.findById(uuid).orElseThrow();
         assertEquals(user.getId(), review.getReviewer().getId());

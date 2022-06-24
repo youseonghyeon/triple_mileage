@@ -11,7 +11,6 @@ import com.triple.mileage.module.review.repository.PhotoRepository;
 import com.triple.mileage.module.review.repository.ReviewRepository;
 import com.triple.mileage.module.review.service.ReviewService;
 import com.triple.mileage.module.user.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,8 +78,6 @@ class ReviewControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        em.flush();
-        em.clear();
 
         //then
         Review findReview = reviewRepository.findById(eventDto.getReviewId()).orElseThrow();
@@ -103,12 +99,14 @@ class ReviewControllerTest {
         Place place = testUtils.createPlace();
         UUID reviewId = UUID.randomUUID();
         List<UUID> photoIds = new ArrayList<>();
+        List<Photo> photos = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             Photo photo = testUtils.createPhoto();
             photoIds.add(photo.getId());
+            photos.add(photo);
         }
         EventDto eventDto = createEventDto(EventAction.ADD, user, place, reviewId, photoIds);
-        reviewService.addReview(eventDto);
+        reviewService.addReview(user, place, photos, eventDto);
         // 성공
 
         User findUser = userRepository.findById(user.getId()).orElseThrow();
@@ -148,12 +146,15 @@ class ReviewControllerTest {
         Place place = testUtils.createPlace();
         UUID reviewId = UUID.randomUUID();
         List<UUID> photoIds = new ArrayList<>();
+        List<Photo> photos = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             Photo photo = testUtils.createPhoto();
             photoIds.add(photo.getId());
+            photos.add(photo);
         }
         EventDto eventDto = createEventDto(EventAction.ADD, user, place, reviewId, photoIds);
-        reviewService.addReview(eventDto);
+        reviewService.addReview(user, place, photos, eventDto);
+
 
         //when
         EventDto deleteEventDto = createEventDto(EventAction.DELETE, user, place, reviewId, new ArrayList<>());

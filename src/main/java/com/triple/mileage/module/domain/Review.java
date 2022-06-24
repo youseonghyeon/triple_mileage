@@ -46,7 +46,19 @@ public class Review extends BaseTimeEntity {
         this.place = place;
     }
 
-    public void modify(String content) {
+    public void modify(String content, List<Photo> newPhotos) {
         this.content = content;
+        for (Photo photo : this.photos) {
+            photo.setReview(null);
+        }
+        for (Photo newPhoto : newPhotos) {
+            newPhoto.setReview(this);
+        }
+    }
+
+    public void resetPhotos() {
+        for (Photo photo : this.photos) {
+            photo.setReview(null);
+        }
     }
 }
