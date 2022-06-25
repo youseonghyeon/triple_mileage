@@ -56,6 +56,7 @@ public class ReviewController {
             }
         }
 
+        // Type과 Event를 잘못 작성할 경우 @Valid를 통해서 400예외가 발생함
         return ResponseEntity.badRequest().body(new Res("fail", "type과 event를 정확히 명시해주세요."));
     }
 

@@ -48,11 +48,12 @@ public class ReviewService {
     }
 
     public void deleteReview(Review review, EventDto eventDto) {
-        int mileageSum = mileagePolicy.deleteReviewMileage(eventDto.getPlaceId(), eventDto.getUserId());
-        if (mileageSum > 0) {
-            pointService.saveAndGiveMileage(review.getReviewer(), review.getId(), eventDto.getType(), eventDto.getAction(), mileageSum * -1);
-        } else if (mileageSum < 0) {
-            log.warn("해당 Place에서 리뷰로 쌓은 마일리지가 ({})입니다. userId={}, placeId={}", mileageSum, eventDto.getUserId(), eventDto.getPlaceId());
+        int mileage = mileagePolicy.deleteReviewMileage(eventDto.getPlaceId(), eventDto.getUserId());
+        if (mileage < 0) {
+            pointService.saveAndGiveMileage(review.getReviewer(), review.getId(), eventDto.getType(), eventDto.getAction(), mileage);
+        } else if (mileage > 0) {
+            // 리뷰로 쌓은 마일리지 총 합은 음수가 될 수 없음(mileage == sum * -1)
+            log.warn("해당 Place에서 리뷰로 쌓은 마일리지가 ({})입니다. userId={}, placeId={}", mileage * -1, eventDto.getUserId(), eventDto.getPlaceId());
         }
 
         // photo 연관관계 해제

@@ -35,6 +35,7 @@ public class MileagePolicy {
         }
         return mileage;
     }
+
     private boolean hasContent(String content) {
         return StringUtils.hasText(content);
     }
@@ -48,42 +49,46 @@ public class MileagePolicy {
     }
 
     public int modifyReviewMileage(Review review, EventDto eventDto) {
-        int beforeCnt = review.getPhotos().size(); // 수정 전 사진 개수
-        int afterCnt = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
-        String beforeContent = review.getContent(); // 수정 전 리뷰 글자 수
-        String afterContent = eventDto.getContent(); // 수정 후 리뷰 글자 수
         int mileage = 0;
-        if (addFirstPhoto(beforeCnt, afterCnt)) {
+        if (addFirstPhoto(review, eventDto)) {
             mileage += 1;
-        } else if (removeAllPhoto(beforeCnt, afterCnt)) {
+        } else if (removeAllPhoto(review, eventDto)) {
             mileage -= 1;
         }
-        if (addContent(beforeContent, afterContent)) {
+        if (addContent(review, eventDto)) {
             mileage += 1;
-        } else if (removeAllContent(beforeContent, afterContent)) {
+        } else if (removeContent(review, eventDto)) {
             mileage -= 1;
         }
         return mileage;
     }
 
-    private boolean removeAllContent(String beforeContent, String afterContent) {
-        return StringUtils.hasText(beforeContent) && !StringUtils.hasText(afterContent);
+    private boolean addFirstPhoto(Review review, EventDto eventDto) {
+        int beforeCnt = review.getPhotos().size(); // 수정 전 사진 개수
+        int afterCnt = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
+        return beforeCnt == 0 && afterCnt > 0;
     }
 
-    private boolean addContent(String beforeContent, String afterContent) {
+    private boolean removeAllPhoto(Review review, EventDto eventDto) {
+        int beforeCnt = review.getPhotos().size(); // 수정 전 사진 개수
+        int afterCnt = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
+        return beforeCnt > 0 && afterCnt == 0;
+    }
+
+    private boolean addContent(Review review, EventDto eventDto) {
+        String beforeContent = review.getContent(); // 수정 전 리뷰 글자 수
+        String afterContent = eventDto.getContent(); // 수정 후 리뷰 글자 수
         return !StringUtils.hasText(beforeContent) && StringUtils.hasText(afterContent);
     }
 
-
-    private boolean addFirstPhoto(int before, int after) {
-        return before == 0 && after > 0;
+    private boolean removeContent(Review review, EventDto eventDto) {
+        String beforeContent = review.getContent(); // 수정 전 리뷰 글자 수
+        String afterContent = eventDto.getContent(); // 수정 후 리뷰 글자 수
+        return StringUtils.hasText(beforeContent) && !StringUtils.hasText(afterContent);
     }
 
-    private boolean removeAllPhoto(int before, int after) {
-        return before > 0 && after == 0;
-    }
 
     public int deleteReviewMileage(UUID placeId, UUID userId) {
-        return pointRepository.findSumByPlaceIdAndUserId(placeId, userId);
+        return pointRepository.findSumByPlaceIdAndUserId(placeId, userId) * -1;
     }
 }
