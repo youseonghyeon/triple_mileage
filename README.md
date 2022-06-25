@@ -154,3 +154,15 @@ http://localhost:8080/history/3ede0ef2-92b7-4817-a5f3-0c575361f746
 * review(N) : (1)place
 
 <img width="764" alt="스크린샷 2022-06-23 오후 11 13 06" src="https://user-images.githubusercontent.com/78669797/175320495-21a7a1ba-18f3-4133-9c29-44571ae2a8cf.png">
+
+
+<br>
+
+### P.S.
+
+프로그래머스에서 지원할 때 프로그래머스 이력서 양식을 맞추느라
+자기소개와 개발 경험이 이력서에 포함되지 않았습니다.
+
+혹시 몰라 깃허브에 이력서 남겨드립니다.  
+[이력서](https://yuseonghyeon.notion.site/0cb6d79e386f4e9f82053a0c0bea5642)  
+감사합니다!
