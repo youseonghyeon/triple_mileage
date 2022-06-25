@@ -9,14 +9,14 @@
 
 * Gradle -> Tasks -> other -> compileQuerydsl 또는
 * 프로젝트 파일에서 아래 명령어 입력
-  > ./gradlew clean compileQuerydsl
+  > ```./gradlew clean compileQuerydsl```
 
 ### DB 연결
 application.yml 파일 위치   
 -> `src/main/resources/application.yml`   
 -> `src/test/resources/application.yml`  
 * 호스트, DB이름, username, password 입력
-* DDL(자동 등록) : `src/main/resources/ad/schema.sql`
+* DDL(자동 등록) 위치 : `src/main/resources/db/schema.sql`
 
 ![db](https://user-images.githubusercontent.com/78669797/175276964-c07620c6-d97b-44a9-85c6-7b0018b5b6f5.png)  
 
@@ -24,7 +24,9 @@ application.yml 파일 위치
 
 ### 이벤트
 POST `http://localhost:8080/events`
-* 리뷰 추가 body (리뷰 추가 메서드가 실행되기 전에 해당UUID의 photo, user, place 더미 객체가 생성됩니다.)
+### 리뷰 추가
+* 리뷰 추가 메서드가 실행되기 전에 해당 UUID의 Photo, User, Place의 더미 객체가 생성됩니다.
+* 내용을 작성하면 +1점, 사진을 1개이상 등록하면 +1점, Place에서 첫 리뷰를 작성하면 +1점이 부여됩니다.
 ``` json
 {  
   "type": "REVIEW",  
@@ -36,8 +38,19 @@ POST `http://localhost:8080/events`
   "placeId": "2e4baf1c-5acb-4efb-a1af-eddada31b099"  
  }
 ```
+* 결과
+```json
+{
+    "result": "success",
+    "message": "리뷰가 성공적으로 등록되었습니다."
+}
+```
+<br>
 
-* 리뷰 수정 body (content, photo 값이 수정됩니다.)
+### 리뷰 수정
+* 리뷰 내용과 사진이 수정됩니다.
+* 내용을 지우면 -1, 내용을 새로 작성하면 +1점이 부여됩니다.
+* 사진을 지우면 -1, 사진을 새로 등록하면 +1점이 부여됩니다.
 ``` json
 {  
   "type": "REVIEW",  
@@ -49,8 +62,18 @@ POST `http://localhost:8080/events`
   "placeId": "2e4baf1c-5acb-4efb-a1af-eddada31b099"  
  }
 ```
+* 결과
+```json
+{
+    "result": "success",
+    "message": "리뷰가 성공적으로 수정되었습니다."
+}
+```
+<br>
 
-* 리뷰 삭제 body (해당 place에서 발생한 mileage가 복원됩니다.)
+### 리뷰 삭제
+* 해당 Place에서 발생했던 마일리지의 총 합 * (-1) 점이 부여됩니다.
+* 리뷰는 삭제되지만, Point History에서는 리뷰Id가 기록됩니다.
 ``` json
 {  
   "type": "REVIEW",  
@@ -60,12 +83,20 @@ POST `http://localhost:8080/events`
   "placeId": "2e4baf1c-5acb-4efb-a1af-eddada31b099"  
  }
 ```
+* 결과
+```json
+{
+    "result": "success",
+    "message": "리뷰가 성공적으로 삭제되었습니다."
+}
+```
 
 <br>  
 
 ### 포인트 조회
-GET `http://localhost:8080/point/{userId}`  
-* 예시 
+GET `http://localhost:8080/point/{userId}`
+* 현재 유저의 마일리지가 출력됩니다.
+* 예시
 ```
 http://localhost:8080/point/3ede0ef2-92b7-4817-a5f3-0c575361f746
 ```
@@ -78,7 +109,8 @@ http://localhost:8080/point/3ede0ef2-92b7-4817-a5f3-0c575361f746
 <br>  
 
 ### 포인트 history 조회
-GET `http://localhost:8080/history/{userId}`  
+GET `http://localhost:8080/history/{userId}`
+* 현재 유저의 마일리지와 마일리지 목록이 날짜(시간) 오름차순으로 출력됩니다.
 * 예시
 ```
 http://localhost:8080/history/3ede0ef2-92b7-4817-a5f3-0c575361f746

@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,33 +29,34 @@ public class ReviewService {
 
     public UUID addReview(User user, Place place, List<Photo> photos, EventDto eventDto) {
         int mileage = mileagePolicy.addReviewMileage(eventDto);
+        if (mileage != 0) {
+            pointService.saveAndGiveMileage(user, eventDto.getReviewId(), eventDto.getType(), eventDto.getAction(), mileage);
+        }
 
         Review review = saveReview(eventDto.getReviewId(), user, eventDto.getContent(), place, photos);
-        if (mileage != 0) {
-            pointService.saveAndGiveMileage(user, review.getId(), eventDto.getType(), eventDto.getAction(), mileage);
-        }
         return review.getId();
     }
 
 
-    public void modifyReview(Review review, List<Photo> newPhotos, EventDto eventDto) {
-        int mileage = mileagePolicy.modifyReviewMileage(review, eventDto);
-
-        review.modify(eventDto.getContent(), newPhotos);
-
+    public void modifyReview(Review previousReview, List<Photo> newPhotos, EventDto eventDto) {
+        int mileage = mileagePolicy.modifyReviewMileage(previousReview, eventDto);
         if (mileage != 0) {
-            pointService.saveAndGiveMileage(review.getReviewer(), review.getId(), eventDto.getType(), eventDto.getAction(), mileage);
+            pointService.saveAndGiveMileage(previousReview.getReviewer(), previousReview.getId(), eventDto.getType(), eventDto.getAction(), mileage);
         }
+
+        previousReview.modify(eventDto.getContent(), newPhotos);
     }
 
     public void deleteReview(Review review, EventDto eventDto) {
-        // photo 연관관계 해제
-        review.resetPhotos();
         int mileageSum = mileagePolicy.deleteReviewMileage(eventDto.getPlaceId(), eventDto.getUserId());
         if (mileageSum > 0) {
             pointService.saveAndGiveMileage(review.getReviewer(), review.getId(), eventDto.getType(), eventDto.getAction(), mileageSum * -1);
+        } else if (mileageSum < 0) {
+            log.warn("해당 Place에서 리뷰로 쌓은 마일리지가 ({})입니다. userId={}, placeId={}", mileageSum, eventDto.getUserId(), eventDto.getPlaceId());
         }
 
+        // photo 연관관계 해제
+        review.resetPhotos();
         reviewRepository.delete(review);
     }
 

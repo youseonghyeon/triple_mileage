@@ -50,8 +50,8 @@ public class MileagePolicy {
     public int modifyReviewMileage(Review review, EventDto eventDto) {
         int beforeCnt = review.getPhotos().size(); // 수정 전 사진 개수
         int afterCnt = eventDto.getAttachedPhotoIds().size(); // 수정 후 사진 개수
-        String beforeContent = review.getContent();
-        String afterContent = eventDto.getContent();
+        String beforeContent = review.getContent(); // 수정 전 리뷰 글자 수
+        String afterContent = eventDto.getContent(); // 수정 후 리뷰 글자 수
         int mileage = 0;
         if (addFirstPhoto(beforeCnt, afterCnt)) {
             mileage += 1;
@@ -60,14 +60,13 @@ public class MileagePolicy {
         }
         if (addContent(beforeContent, afterContent)) {
             mileage += 1;
-        }
-        if (removeContent(beforeContent, afterContent)) {
+        } else if (removeAllContent(beforeContent, afterContent)) {
             mileage -= 1;
         }
         return mileage;
     }
 
-    private boolean removeContent(String beforeContent, String afterContent) {
+    private boolean removeAllContent(String beforeContent, String afterContent) {
         return StringUtils.hasText(beforeContent) && !StringUtils.hasText(afterContent);
     }
 

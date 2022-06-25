@@ -4,10 +4,10 @@ import com.triple.mileage.infra.DataInitializer;
 import com.triple.mileage.infra.exception.ReviewLimitException;
 import com.triple.mileage.module.domain.*;
 import com.triple.mileage.module.place.repository.PlaceRepository;
+import com.triple.mileage.module.review.dto.EventDto;
 import com.triple.mileage.module.review.repository.PhotoRepository;
 import com.triple.mileage.module.review.repository.ReviewRepository;
 import com.triple.mileage.module.review.service.ReviewService;
-import com.triple.mileage.module.review.dto.EventDto;
 import com.triple.mileage.module.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+
 
 @Slf4j
 @RestController
@@ -46,38 +47,42 @@ public class ReviewController {
         dataInitializer.init(eventDto);
 
         if (eventDto.getType().equals(EventType.REVIEW)) {
-            reviewHandler(eventDto);
+            if (eventDto.getAction().equals(EventAction.ADD)) {
+                return addReview(eventDto);
+            } else if (eventDto.getAction().equals(EventAction.MOD)) {
+                return modifyReview(eventDto);
+            } else if (eventDto.getAction().equals(EventAction.DELETE)) {
+                return deleteReview(eventDto);
+            }
         }
 
-        return ResponseEntity.ok().body(new Res("success"));
+        return ResponseEntity.badRequest().body(new Res("fail", "type과 event를 정확히 명시해주세요."));
     }
 
-    private void reviewHandler(EventDto eventDto) {
-        EventAction action = eventDto.getAction();
-        if (action.equals(EventAction.ADD)) {
-            reviewLimitValidator(eventDto);
+    private ResponseEntity addReview(EventDto eventDto) {
+        reviewLimitValidator(eventDto);
 
-            // 객체 조회
-            User user = userRepository.findById(eventDto.getUserId()).orElseThrow();
-            Place place = placeRepository.findById(eventDto.getPlaceId()).orElseThrow();
-            List<Photo> photos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
+        User user = userRepository.findById(eventDto.getUserId()).orElseThrow();
+        Place place = placeRepository.findById(eventDto.getPlaceId()).orElseThrow();
+        List<Photo> photos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
 
-            reviewService.addReview(user, place, photos, eventDto);
+        reviewService.addReview(user, place, photos, eventDto);
+        return ResponseEntity.ok().body(new Res("success", "리뷰가 성공적으로 등록되었습니다."));
+    }
 
-        } else if (action.equals(EventAction.MOD)) {
-            // 객체 조회
-            Review review = reviewRepository.findWithPhotosById(eventDto.getReviewId());
-            List<Photo> newPhotos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
+    private ResponseEntity modifyReview(EventDto eventDto) {
+        Review review = reviewRepository.findWithPhotosById(eventDto.getReviewId());
+        List<Photo> newPhotos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
 
-            reviewService.modifyReview(review, newPhotos, eventDto);
+        reviewService.modifyReview(review, newPhotos, eventDto);
+        return ResponseEntity.ok().body(new Res("success", "리뷰가 성공적으로 수정되었습니다."));
+    }
 
-        } else if (action.equals(EventAction.DELETE)) {
-            // 객체 조회
-            Review review = reviewRepository.findWithPhotosById(eventDto.getReviewId());
+    private ResponseEntity deleteReview(EventDto eventDto) {
+        Review review = reviewRepository.findWithPhotosById(eventDto.getReviewId());
 
-            reviewService.deleteReview(review, eventDto);
-
-        }
+        reviewService.deleteReview(review, eventDto);
+        return ResponseEntity.ok().body(new Res("success", "리뷰가 성공적으로 삭제되었습니다."));
     }
 
     private void reviewLimitValidator(EventDto eventDto) {
