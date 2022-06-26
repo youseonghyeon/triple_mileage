@@ -65,7 +65,7 @@ class ReviewServiceTest {
         assertNotNull(review.getCreatedDate());
         assertNotNull(review.getModifiedDate());
         //then
-        PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
+        PointHistory history = pointRepository.findByReviewIdAndReceiverIdOrderByCreatedDateAsc(review.getId(), user.getId()).get(0);
         User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(2, findUser.getMileage());
         assertEquals(2, history.getValue());
@@ -106,7 +106,7 @@ class ReviewServiceTest {
         assertNotNull(review.getCreatedDate());
         assertNotNull(review.getModifiedDate());
         //then
-        PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
+        PointHistory history = pointRepository.findByReviewIdAndReceiverIdOrderByCreatedDateAsc(review.getId(), user.getId()).get(0);
         User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(3, findUser.getMileage());
         assertEquals(3, history.getValue());
@@ -148,7 +148,7 @@ class ReviewServiceTest {
         assertNotNull(review.getCreatedDate());
         assertNotNull(review.getModifiedDate());
         //then
-        PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
+        PointHistory history = pointRepository.findByReviewIdAndReceiverIdOrderByCreatedDateAsc(review.getId(), user.getId()).get(0);
         User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(2, findUser.getMileage());
         assertEquals(2, history.getValue());
@@ -187,7 +187,7 @@ class ReviewServiceTest {
         assertEquals(newContent, review.getContent());
         assertEquals(1, review.getPhotos().size());
         //then
-        List<PointHistory> histories = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId());
+        List<PointHistory> histories = pointRepository.findByReviewIdAndReceiverIdOrderByCreatedDateAsc(review.getId(), user.getId());
         User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(2, histories.size());
         PointHistory history = histories.get(1);
@@ -228,7 +228,7 @@ class ReviewServiceTest {
         assertEquals(0, review.getPhotos().size());
 
         //then
-        List<PointHistory> histories = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId());
+        List<PointHistory> histories = pointRepository.findByReviewIdAndReceiverIdOrderByCreatedDateAsc(review.getId(), user.getId());
         User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(2, histories.size());
         assertEquals(2, findUser.getMileage()); // 3 - 1점
@@ -302,7 +302,7 @@ class ReviewServiceTest {
         assertNotNull(review.getCreatedDate());
         assertNotNull(review.getModifiedDate());
         //then
-        PointHistory history = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId()).get(0);
+        PointHistory history = pointRepository.findByReviewIdAndReceiverIdOrderByCreatedDateAsc(review.getId(), user.getId()).get(0);
         User findUser = userRepository.findById(user.getId()).orElseThrow();
         assertEquals(1, findUser.getMileage());
         assertEquals(1, history.getValue());

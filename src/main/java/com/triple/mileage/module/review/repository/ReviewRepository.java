@@ -10,6 +10,9 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
+    @EntityGraph(attributePaths = {"reviewer", "photos"}, type = EntityGraph.EntityGraphType.FETCH)
+    Review findWithReceiverAndPhotosById(UUID reviewId);
+
     @EntityGraph(attributePaths = {"photos"}, type = EntityGraph.EntityGraphType.FETCH)
     Review findWithPhotosById(UUID reviewId);
 

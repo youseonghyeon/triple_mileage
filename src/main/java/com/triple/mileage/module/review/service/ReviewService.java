@@ -30,7 +30,7 @@ public class ReviewService {
     public UUID addReview(User user, Place place, List<Photo> photos, EventDto eventDto) {
         int mileage = mileagePolicy.addReviewMileage(eventDto);
         if (mileage != 0) {
-            pointService.saveAndGiveMileage(user, eventDto.getReviewId(), eventDto.getType(), eventDto.getAction(), mileage);
+            pointService.saveAndGiveMileage(user, eventDto, mileage);
         }
 
         Review review = saveReview(eventDto.getReviewId(), user, eventDto.getContent(), place, photos);
@@ -41,19 +41,18 @@ public class ReviewService {
     public void modifyReview(Review previousReview, List<Photo> newPhotos, EventDto eventDto) {
         int mileage = mileagePolicy.modifyReviewMileage(previousReview, eventDto);
         if (mileage != 0) {
-            pointService.saveAndGiveMileage(previousReview.getReviewer(), previousReview.getId(), eventDto.getType(), eventDto.getAction(), mileage);
+            pointService.saveAndGiveMileage(previousReview.getReviewer(), eventDto, mileage);
         }
 
         previousReview.modify(eventDto.getContent(), newPhotos);
     }
 
     public void deleteReview(Review review, EventDto eventDto) {
-        int mileage = mileagePolicy.deleteReviewMileage(eventDto.getPlaceId(), eventDto.getUserId());
+        int mileage = mileagePolicy.deleteReviewMileage(eventDto.getReviewId());
         if (mileage < 0) {
-            pointService.saveAndGiveMileage(review.getReviewer(), review.getId(), eventDto.getType(), eventDto.getAction(), mileage);
+            pointService.saveAndGiveMileage(review.getReviewer(), eventDto, mileage);
         } else if (mileage > 0) {
-            // 리뷰로 쌓은 마일리지 총 합은 음수가 될 수 없음(mileage == sum * -1)
-            log.warn("해당 Place에서 리뷰로 쌓은 마일리지가 ({})입니다. userId={}, placeId={}", mileage * -1, eventDto.getUserId(), eventDto.getPlaceId());
+            log.warn("해당 리뷰로 쌓은 마일리지는 음수가 될 수 없습니다. userId={}, placeId={}", eventDto.getUserId(), eventDto.getPlaceId());
         }
 
         // photo 연관관계 해제
@@ -63,7 +62,6 @@ public class ReviewService {
 
 
     private Review saveReview(UUID id, User reviewer, String content, Place place, List<Photo> photos) {
-        // *** review와 savedReview는 다른 객체임 (id(PK) 직접할당 특징)
         Review review = new Review(id, reviewer, content, place);
         Review savedReview = reviewRepository.save(review);
         for (Photo photo : photos) {

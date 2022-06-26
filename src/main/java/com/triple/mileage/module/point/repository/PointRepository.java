@@ -10,4 +10,6 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public interface PointRepository extends JpaRepository<PointHistory, UUID>, CustomPointRepository {
 
+
+    List<PointHistory> findByReviewIdAndReceiverIdOrderByCreatedDateAsc(UUID reviewId, UUID receiverId);
 }

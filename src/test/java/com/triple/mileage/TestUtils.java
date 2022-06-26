@@ -52,8 +52,5 @@ public class TestUtils {
         return placeRepository.save(place);
     }
 
-    public PointHistory createPointHistory(Review review) {
-        PointHistory pointHistory = new PointHistory(review.getId(), review.getReviewer(), TestConst.POINT_TYPE, TestConst.POINT_ACTION, TestConst.POINT_VALUE);
-        return pointRepository.save(pointHistory);
-    }
+
 }

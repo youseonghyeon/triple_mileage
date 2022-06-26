@@ -56,7 +56,7 @@ public class ReviewController {
             }
         }
 
-        // Type과 Event를 잘못 작성할 경우 @Valid를 통해서 400예외가 발생함
+        // Type과 Event를 잘못 작성할 경우 @Valid를 통해서 400에러가 발생함
         return ResponseEntity.badRequest().body(new Res("fail", "type과 event를 정확히 명시해주세요."));
     }
 
@@ -72,7 +72,7 @@ public class ReviewController {
     }
 
     private ResponseEntity modifyReview(EventDto eventDto) {
-        Review review = reviewRepository.findWithPhotosById(eventDto.getReviewId());
+        Review review = reviewRepository.findWithReceiverAndPhotosById(eventDto.getReviewId());
         List<Photo> newPhotos = photoRepository.findAllById(eventDto.getAttachedPhotoIds());
 
         reviewService.modifyReview(review, newPhotos, eventDto);
@@ -106,8 +106,5 @@ public class ReviewController {
         String result;
         String message;
 
-        public Res(String result) {
-            this.result = result;
-        }
     }
 }

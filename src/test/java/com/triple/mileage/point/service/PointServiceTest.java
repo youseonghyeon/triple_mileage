@@ -4,6 +4,7 @@ import com.triple.mileage.TestUtils;
 import com.triple.mileage.module.domain.*;
 import com.triple.mileage.module.point.repository.PointRepository;
 import com.triple.mileage.module.point.service.PointService;
+import com.triple.mileage.module.review.dto.EventDto;
 import com.triple.mileage.module.review.repository.ReviewRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,10 +39,15 @@ class PointServiceTest {
         User user = testUtils.createUser();
         Place place = testUtils.createPlace();
         Review review = testUtils.createReview(user, place);
+
+        EventDto eventDto = new EventDto();
+        eventDto.setReviewId(review.getId());
+        eventDto.setType(EventType.REVIEW);
+        eventDto.setAction(EventAction.ADD);
         //when
-        pointService.saveAndGiveMileage(user, review.getId(), EventType.REVIEW, EventAction.ADD, 3);
+        pointService.saveAndGiveMileage(user, eventDto, 3);
         //then
-        List<PointHistory> historyList = pointRepository.findByReviewIdAndUserId(review.getId(), user.getId());
+        List<PointHistory> historyList = pointRepository.findByReviewIdAndReceiverIdOrderByCreatedDateAsc(review.getId(), user.getId());
         PointHistory history = historyList.get(0);
         assertEquals(history.getAction(), EventAction.ADD);
         assertEquals(history.getType(), EventType.REVIEW);

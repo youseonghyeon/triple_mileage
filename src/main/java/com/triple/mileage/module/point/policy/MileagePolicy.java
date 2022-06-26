@@ -18,6 +18,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MileagePolicy {
 
+    private final int CONTENT_MILEAGE = 1;
+    private final int PHOTO_MILEAGE = 1;
+    private final int FIRST_CUSTOMER_MILEAGE = 1;
+
     private final ReviewRepository reviewRepository;
     private final PointRepository pointRepository;
 
@@ -25,13 +29,13 @@ public class MileagePolicy {
     public int addReviewMileage(EventDto eventDto) {
         int mileage = 0;
         if (hasContent(eventDto.getContent())) {
-            mileage += 1;
+            mileage += CONTENT_MILEAGE;
         }
         if (firstCustomer(eventDto.getPlaceId())) {
-            mileage += 1;
+            mileage += FIRST_CUSTOMER_MILEAGE;
         }
         if (hasPhoto(eventDto.getAttachedPhotoIds())) {
-            mileage += 1;
+            mileage += PHOTO_MILEAGE;
         }
         return mileage;
     }
@@ -51,14 +55,14 @@ public class MileagePolicy {
     public int modifyReviewMileage(Review review, EventDto eventDto) {
         int mileage = 0;
         if (addFirstPhoto(review, eventDto)) {
-            mileage += 1;
+            mileage += PHOTO_MILEAGE;
         } else if (removeAllPhoto(review, eventDto)) {
-            mileage -= 1;
+            mileage -= PHOTO_MILEAGE;
         }
         if (addContent(review, eventDto)) {
-            mileage += 1;
+            mileage += CONTENT_MILEAGE;
         } else if (removeContent(review, eventDto)) {
-            mileage -= 1;
+            mileage -= CONTENT_MILEAGE;
         }
         return mileage;
     }
@@ -87,8 +91,7 @@ public class MileagePolicy {
         return StringUtils.hasText(beforeContent) && !StringUtils.hasText(afterContent);
     }
 
-
-    public int deleteReviewMileage(UUID placeId, UUID userId) {
-        return pointRepository.findSumByPlaceIdAndUserId(placeId, userId) * -1;
+    public int deleteReviewMileage(UUID reviewId) {
+        return pointRepository.findSumByReviewId(reviewId) * -1;
     }
 }

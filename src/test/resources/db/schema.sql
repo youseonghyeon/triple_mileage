@@ -67,5 +67,5 @@ alter table review
         foreign key (user_id) references user (user_id);
 
 alter table point_history
-    add index (review_id, created_date);
+    add index (review_id);
 

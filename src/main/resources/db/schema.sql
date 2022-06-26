@@ -1,10 +1,10 @@
 create table photo
 (
-    photo_id         BINARY(16) not null,
-    path             varchar(255),
-    created_date     datetime(6),
-    modified_date    datetime(6),
-    review_id BINARY(16),
+    photo_id      BINARY(16) not null,
+    path          varchar(255),
+    created_date  datetime(6),
+    modified_date datetime(6),
+    review_id     BINARY(16),
     primary key (photo_id)
 ) engine = InnoDB;
 
@@ -67,5 +67,5 @@ alter table review
         foreign key (user_id) references user (user_id);
 
 alter table point_history
-    add index (review_id, created_date);
+    add index (review_id);
 

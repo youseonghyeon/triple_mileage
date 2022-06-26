@@ -12,6 +12,7 @@
   > ```./gradlew clean compileQuerydsl```
 
 ### DB 연결
+해당 애플리케이션은 MySQL 8.0 버전에 맞춰 제작되었습니다.  
 application.yml 파일 위치   
 -> `src/main/resources/application.yml`   
 -> `src/test/resources/application.yml`  
@@ -72,7 +73,7 @@ POST `http://localhost:8080/events`
 <br>
 
 ### 리뷰 삭제
-* 해당 Place에서 발생했던 마일리지의 총 합 * (-1) 점이 부여됩니다.
+* 해당 리뷰에서 발생했던 마일리지의 총 합 * (-1) 점이 부여됩니다.
 * 리뷰는 삭제되지만, Point History에서는 리뷰Id가 기록됩니다.
 ``` json
 {  
@@ -124,21 +125,18 @@ http://localhost:8080/history/3ede0ef2-92b7-4817-a5f3-0c575361f746
       "type": "REVIEW",
       "action": "ADD",
       "value": 3,
-      "reviewId": "240a0658-dc5f-4878-9381-ebb7b2667722",
       "date": "2022-06-23T20:33:59.140479"
     },
     {
       "type": "REVIEW",
       "action": "MOD",
       "value": -1,
-      "reviewId": "240a0658-dc5f-4878-9381-ebb7b2667722",
       "date": "2022-06-23T20:34:25.427655"
     },
     {
       "type": "REVIEW",
       "action": "DELETE",
       "value": -2,
-      "reviewId": "240a0658-dc5f-4878-9381-ebb7b2667722",
       "date": "2022-06-23T20:34:52.57399"
     }
   ]
@@ -152,6 +150,7 @@ http://localhost:8080/history/3ede0ef2-92b7-4817-a5f3-0c575361f746
 * user(1) : (N)review
 * review(1) : (N)photo
 * review(N) : (1)place
+* index : point_history->review_id
 
 <img width="764" alt="스크린샷 2022-06-23 오후 11 13 06" src="https://user-images.githubusercontent.com/78669797/175320495-21a7a1ba-18f3-4133-9c29-44571ae2a8cf.png">
 
